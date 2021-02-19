@@ -1,0 +1,243 @@
+<!-- Created by Bracy 0.4 on Monday, February 15, 2021 at 4:31 PM CST -->
+<html>
+ <head>
+  <title>
+   CSci 2041 Computer Laboratory 4
+  </title>
+  <style>
+   a:active
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   a:link
+    { color: blue;
+      font-weight: bold;
+      text-decoration: none }
+   a:visited
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   hr
+    { background-color: black;
+      border: none;
+      color: black;
+      height: 1px }
+   table
+    { border-collapse: collapse }
+  </style>
+ </head>
+ <body bgcolor="#FFFFFF">
+  <p align="center">
+   <b>Computer Laboratory 4</b>
+   <br />
+   <b>CS<small>CI</small> 2041: Advanced Programming Principles</b>
+   <br />
+   <b>Tuesday, February 16, 2021</b>
+  </p>
+  <p>
+   <b>0. Introduction.</b>
+  </p>
+  <p align="justify">
+   <i>Continuation Passing Style</i> (<small>CPS</small>) is a form
+   of programming in which functions do not return values. Instead, when a
+   function is called, it is given another function, called its
+   <i>continuation.</i> When the function produces a value, it calls its
+   continuation with the value, instead of returning it. In this way, the same
+   function can provide no values (by never calling its continuation), one
+   value (by calling its continuation once), two values (by calling its
+   continuation twice), etc. It can even provide <i>n</i> values, where
+   <i>n</i> is a number not known in advance, by calling its continuation
+   <i>n</i> times. In this computer laboratory, you will write a
+   <small>CPS</small> function that produces all permutations of a list.
+  </p>
+  <p>
+   <b>1. Theory.</b>
+  </p>
+  <p align="justify">
+   Suppose that <i>l</i> is a finite list of zero or more distinct
+   elements (so there are no duplicates). Then a <i>permutation</i> of
+   <i>l</i> is either <i>l</i> itself, or else a list made by
+   rearranging the elements of <i>l.</i> For example, the OCaml list
+   <tt>[0;&nbsp;1;&nbsp;2]</tt> has six possible permutations, shown
+   below.
+  </p>
+  <blockquote>
+   <p>
+    <tt>[0;&nbsp;1;&nbsp;2]&nbsp;</tt>
+    <br />
+    <tt>[0;&nbsp;2;&nbsp;1]&nbsp;</tt>
+    <br />
+    <tt>[1;&nbsp;0;&nbsp;2]&nbsp;</tt>
+    <br />
+    <tt>[1;&nbsp;2;&nbsp;0]&nbsp;</tt>
+    <br />
+    <tt>[2;&nbsp;0;&nbsp;1]&nbsp;</tt>
+    <br />
+    <tt>[2;&nbsp;1;&nbsp;0]</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   If <i>l</i> has <i>n</i> distinct elements, then it has
+   <i>n</i>! permutations. This is because there are <i>n</i>
+   possible choices for the first element of a permutation,
+   <i>n</i>&#8722;1 choices for the second element, <i>n</i>&#8722;2
+   choices for the third element, etc., until finally there is only one choice
+   left for the last element. As a result, the total number of permutations is:
+  </p>
+  <blockquote>
+   <p>
+    <i>n</i>! = <i>n</i> &#215; (<i>n</i>&#8722;1) &#215;
+    (<i>n</i>&#8722;2) &#8943; &#215; 2 &#215; 1
+   </p>
+  </blockquote>
+  <p align="justify">
+   As a result, the number of permutations rises very rapidly as the length of
+   the list <i>l</i> increases. For example, a list of length with ten
+   elements has 10!&nbsp;= 3628800 possible permutations.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Now suppose we want to generate all possible
+   permutations of a list; perhaps we want to know if one of them has an
+   interesting property. Since there are so many permutations, it would take
+   too much memory to generate them all and store them in another list. It
+   would be better to generate them one at a time, so we need only the memory
+   for a single permutation. This can be done in OCaml using
+   <small>CPS</small>.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Here&rsquo;s a sketch of an OCaml function
+   called <tt>permuting</tt> that generates permutations in this way. It
+   takes three arguments: a continuation called <tt>etc</tt>, a list of
+   distinct things that have been permuted called <tt>permutedThings</tt>,
+   and a list of distinct things that have not yet been permuted called
+   <tt>unpermutedThings</tt>. We do not care what the <i>things</i>
+   are: they might be characters, numbers, strings, etc.
+  </p>
+  <ol>
+   <li>
+   <p align="justify">
+    If <tt>unpermutedThings</tt> is empty, then call <tt>etc</tt> on
+    <tt>permutedThings</tt>, then stop.
+   </p>
+   <li>
+   <p align="justify">
+    If <tt>unpermutedThings</tt> is not empty, then choose a thing from
+    <tt>unpermutedThings</tt> somehow. Make a new list of
+    <tt>permutedThings</tt>, by adding the chosen thing to the front of
+    <tt>permutedThings</tt>. Make a new list of
+    <tt>unpermutedThings</tt>, by removing the chosen thing from
+    <tt>unpermutedThings</tt>. Call <tt>permuting</tt> recursively
+    with <tt>etc</tt>, the new <tt>permutedThings</tt>, and the new
+    <tt>unpermutedThings</tt>.
+   </p>
+   <li>
+   <p align="justify">
+    Go back to step 2, but choose a different thing from
+    <tt>unpermutedThings</tt> this time. Continue until all the things
+    have been chosen once, then stop.
+   </p>
+  </ol>
+  <p align="justify">
+   Note that each time we call <tt>permuting</tt>, the list
+   <tt>unpermutedThings</tt> is smaller. That means it will eventually
+   become empty, so <tt>permuting</tt> will terminate at step 1. Also note
+   that <tt>permuting</tt> is a <small>CPS</small> function: it never
+   returns a permutation! Instead, every time it generates a permutation, it
+   calls its continuation <tt>etc</tt>.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; At this point, you may wonder how we get the
+   permutations, since they are generated but never returned. The answer is
+   that the continuation <tt>etc</tt> contains code that processes each
+   permutation&#8212;in other words, it <i>continues</i> the computation
+   for each permutation.
+  </p>
+  <p>
+   <b>2. Implementation.</b>
+  </p>
+  <p align="justify">
+   For this laboratory assignment, you must write the following OCaml
+   functions. Of course you may write more helper functions if you need them.
+   Your functions must not use loops, mutable objects, or variables.
+  </p>
+  <blockquote>
+   <dl compact="compact">
+    <dt>
+     <p>
+      <tt>choose etc things</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Call the continuation <tt>etc</tt> on each member of the list
+      <tt>things.</tt>
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>allbut things thing</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Return a list that is like <tt>things</tt>, but in which the first
+      appearance of <tt>thing</tt> has been removed.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>permute etc things</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Assume <tt>things</tt> is a list with distinct elements. Generate
+      all possible permutations of <tt>things</tt>, one at a time. Each
+      permutation is a list with the same elements as <tt>things</tt>, all
+      but one of which has its elements in a different order. Call
+      <tt>etc</tt> on each permutation.
+     </p>
+    </dd>
+   </dl>
+  </blockquote>
+  <p align="justify">
+   Here are some hints.
+  </p>
+  <ul>
+   <li>
+   <p align="justify">
+    The function <tt>choose</tt> is a <small>CPS</small> function, so
+    it does not return a useful value. If you write it in the obvious way, then
+    it will return <tt>()</tt>. It may need to use the OCaml semicolon
+    operator &lsquo;<tt>;</tt>&rsquo;.
+   </p>
+   <li>
+   <p align="justify">
+    The function <tt>allbut</tt> is not a <small>CPS</small>
+    function: it returns a list. You wrote a function very much like
+    <tt>allbut</tt> in the first laboratory assignment for this course.
+   </p>
+   <li>
+   <p align="justify">
+    The function <tt>permute</tt> is a <small>CPS</small> function,
+    so it does not return a useful value. If you write it in the obvious way,
+    then it will return <tt>()</tt>. It must use something like
+    <tt>permuting</tt> (described in the previous section) as a helper. It
+    must also use <tt>choose</tt> and <tt>allbut</tt> as helpers.
+   </p>
+  </ul>
+  <p>
+   <b>3. Deliverables.</b>
+  </p>
+  <p align="justify">
+   The file
+   <a href="tests4.ml">
+    <tt>tests4.ml</tt>
+   </a>
+   contains some tests, worth <b>30 points</b>. It also contains a
+   definition of an OCaml function called <tt>printThings</tt> that prints
+   lists. Insert your code into this file, then run it with OCaml. When you
+   think your code is correct, then submit the file with your code in it. The
+   lab TA&rsquo;s will tell you how and where to turn in your work. It must be
+   submitted by <b>11:55 <small>PM</small></b> on <b>Tuesday,
+   February 23, 2021</b>.
+  </p>
+ </body>
+</html>
