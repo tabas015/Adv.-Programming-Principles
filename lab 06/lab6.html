@@ -1,0 +1,284 @@
+<!-- Created by Bracy 0.4 on Monday, March 1, 2021 at 8:18 PM CST -->
+<html>
+ <head>
+  <title>
+   CSci 2041 Computer Laboratory 6
+  </title>
+  <style>
+   a:active
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   a:link
+    { color: blue;
+      font-weight: bold;
+      text-decoration: none }
+   a:visited
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   hr
+    { background-color: black;
+      border: none;
+      color: black;
+      height: 1px }
+   table
+    { border-collapse: collapse }
+  </style>
+ </head>
+ <body bgcolor="#FFFFFF">
+  <p align="center">
+   <b>Computer Laboratory 6</b>
+   <br />
+   <b>CS<small>CI</small> 2041: Advanced Programming Principles</b>
+   <br />
+   <b>March 2, 2021</b>
+  </p>
+  <p>
+   <b>0. Introduction.</b>
+  </p>
+  <p align="justify">
+   In this laboratory assignment, you will write OCaml functions that perform
+   operations on mutable queues. The queues will be implemented as circular
+   doubly-linked lists with head nodes&#8212;sometimes called <i>symmetric
+   lists.</i> Queues and symmetric lists are commonly discussed in a data
+   structures course, like the one that is a prerequisite for
+   CS<small>CI</small> 2041. This assignment assumes that you are familiar
+   with them.
+  </p>
+  <p>
+   <b>1. Theory.</b>
+  </p>
+  <p align="justify">
+   We&rsquo;ll start with some terminology. A <i>singly-linked list</i> is
+   built from zero or more <i>nodes,</i> each of which has a pointer to
+   the node that follows it. A <i>doubly-linked list</i> is also built
+   from zero or more nodes, but now each node has a pointer both to the node
+   that precedes it, and to the node that follows it. A <i>circular
+   doubly-linked list</i> is a doubly linked list of zero or more nodes,
+   whose last node (if any) points to its first node, and vice versa. A
+   <i>circular doubly-linked list with a head node</i> is a
+   circular-doubly linked list of one or more nodes. Within the list, a
+   <i>head node</i> eliminates special cases when adding nodes to the
+   list, or when deleting nodes from the list.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For example, the following diagram shows a
+   circular doubly-linked list with a head node (pointed to by the variable
+   <tt>head</tt>). Each node has a <i>left pointer,</i> a data object
+   called an <i>element</i> (shown as an upper case letter), and a
+   <i>right pointer.</i>
+  </p>
+  <p align="center">
+   <img border="0" src="cdll.png">
+  </p>
+  <p align="justify">
+   Note that the head node is <i>always</i> present, even in an empty
+   list. If the list is empty, then the left and right pointers of the head
+   node point back to the head node itself.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A <i>queue</i> is a finite, ordered
+   series of elements, in which all additions occur at one end, called the
+   <i>rear</i> of the queue, and all deletions occur at the opposite end,
+   called the <i>front</i> of the queue. For example, a line of people
+   waiting to enter a theater is a queue, because people join the line at the
+   rear, and leave the line at the front.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A circular doubly-linked list with a head
+   node can implement a queue. The rear of the queue is the node on the left of
+   the head node (with element <i>E</i> in the diagram). When we add a new
+   element to the queue, we add the node containing the element on the left of
+   the head node. Similarly, the front of the queue is the node on the right of
+   the head node (with element <i>A</i> in the diagram). When we delete an
+   old element from the queue, we delete the node containing the element on the
+   right of the head node.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If we implement a queue in this way, then we
+   need not make special case tests to determine if the queue is empty. This is
+   because the queue is <i>never</i> empty&#8212;the head node is always
+   present.
+  </p>
+  <p>
+   <b>2. Implementation.</b>
+  </p>
+  <p align="justify">
+   For this laboratory assignment, you must implement your queue as a circular
+   doubly-linked list with a head node. Each node in the list has the type
+   <tt>'base</tt>&nbsp;<tt>mutyQueue</tt>, which is defined as
+   follows.
+  </p>
+  <blockquote>
+   <p>
+    <tt>type&nbsp;'base&nbsp;mutyQueue&nbsp;=&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;MutyQueueNode&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;of&nbsp;'base&nbsp;&#8727;&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'base&nbsp;mutyQueue&nbsp;ref&nbsp;&#8727;&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'base&nbsp;mutyQueue&nbsp;ref&nbsp;;;</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   Each node has three parts: an immutable <i>element</i> of type
+   <tt>'base</tt>, a variable <i>left pointer,</i> whose value
+   has the type <tt>'base</tt>&nbsp;<tt>mutyQueue</tt>, and a
+   <i>right pointer,</i> whose value also has the
+   <tt>'base</tt>&nbsp;<tt>mutyQueue</tt>.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; You must write the following functions. They
+   perform operations on the circular doubly linked lists that implement
+   queues.
+  </p>
+  <blockquote>
+   <dl compact="compact">
+    <dt>
+     <p>
+      <tt>mutyQueueMake s</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Return the head node of a new queue, whose element is <tt>s</tt>,
+      and whose left and right pointers point back to the head node itself. The
+      element <tt>s</tt> will be returned if you try to dequeue an element
+      from the queue when it is empty. The queue has type
+      <i>t</i>&nbsp;<tt>mutyQueue</tt>, where <i>t</i> is the
+      type of <tt>s</tt>.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>mutyQueueEmpty q</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Test if the queue with head node <tt>q</tt> is empty. Return
+      <tt>true</tt> if it is, and return <tt>false</tt> if it is not.
+      Do not change <tt>q</tt> in any way!
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>mutyQueueEnqueue q e</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Add a node to the left of the head node <tt>q</tt>. This node
+      contains the element <tt>e</tt>. Return <tt>()</tt>.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>mutyQueueDequeue q</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      If <tt>q</tt> is empty, then return <tt>s</tt> from
+      <tt>mutyQueueMake</tt> above. Otherwise, get the node on the right
+      of the head node <tt>q</tt>. It contains the element
+      <tt>e</tt>. Delete that node and return <tt>e</tt>.
+     </p>
+    </dd>
+   </dl>
+  </blockquote>
+  <p align="justify">
+   Here are some hints.
+  </p>
+  <ul>
+   <li>
+   <p align="justify">
+    All these functions must run in <i>O</i>(1) time, without loops or
+    recursions.
+   </p>
+   <li>
+   <p align="justify">
+    Most objects in OCaml are really accessed through pointers, although the
+    language doesn&rsquo;t make that explicit. Some other languages, such as
+    Python, treat objects in the same way.
+   </p>
+   <li>
+   <p align="justify">
+    Queues are represented by pointers to their head nodes. Whenever you see
+    <tt>q</tt> in the above descriptions, it means a pointer to the head
+    node of a circular doubly-linked list.
+   </p>
+   <li>
+   <p align="justify">
+    The function <tt>mutyQueueMake</tt> must make a head node, whose left
+    and right pointers point back to the head node itself. Such a node can be
+    made easily using <tt>let</tt>&nbsp;<tt>rec</tt>, like this. Code
+    to initialize the head node&rsquo;s element goes in place of
+    &lsquo;&lsquo;<tt>...</tt>&rsquo;&rsquo;.
+   </p>
+   <blockquote>
+    <p>
+     <tt>let&nbsp;rec&nbsp;h&nbsp;=&nbsp;MutyQueueNode&nbsp;(...,&nbsp;ref&nbsp;h,&nbsp;ref&nbsp;h)&nbsp;</tt>
+     <br />
+     <tt>in&nbsp;h</tt>
+    </p>
+   </blockquote>
+   <p align="justify">
+    Do not make a node and then assign values to its left and right pointers,
+    as you would in an imperative programming language&#8212;that will not work
+    in OCaml.
+   </p>
+   <li>
+   <p align="justify">
+    Use <tt>match</tt>&#8211;<tt>with</tt> to access the elements,
+    left pointers, and right pointers of nodes. Note that the left and right
+    pointers are <i>variables</i>&#8212;they are <i>not</i> the
+    values of variables! If <i>v</i> is a variable, then
+    <tt>!</tt>&nbsp;<i>v</i> returns <i>v</i>&rsquo;s value, and
+    <tt>ref</tt>&nbsp;<i>x</i> returns a variable whose value is
+    <i>x</i>. Also,
+    <tt>ref</tt>&nbsp;<tt>!</tt>&nbsp;<i>v</i> makes a new
+    variable with the same value as <i>v</i>.
+   </p>
+   <li>
+   <p align="justify">
+    The function <tt>mutyQueueEmpty</tt> must test if the left and right
+    pointers of the head node point back to the head node. To make this test,
+    use the OCaml operator &lsquo;<tt>==</tt>&rsquo;. It tests if two
+    pointers point to the same object. Do <i>not</i> use
+    &lsquo;<tt>=</tt>&rsquo;, because it will try to traverse your
+    circular lists and run out of stack space.
+   </p>
+   <li>
+   <p align="justify">
+    When <tt>mutyQueueEnqueue</tt> adds a new node from a queue, then it
+    must still be circular after the node is added. When
+    <tt>mutyQueueDequeue</tt> removes an old node from a queue, then it
+    must still be circular after the node is removed. <i>Never</i> delete
+    the queue&rsquo;s head node!
+   </p>
+   <li>
+   <p align="justify">
+    If you write <tt>mutyQueueDequeue</tt> correctly, then you will not
+    have to make a special case check for an empty list. The same code that
+    deletes a node from a non-empty list will leave an empty list (with just a
+    head node) unchanged, and will return the element in the head node.
+   </p>
+  </ul>
+  <p>
+   <b>3. Deliverables.</b>
+  </p>
+  <p align="justify">
+   The file
+   <a href="tests6.ml">
+    <tt>tests6.ml</tt>
+   </a>
+   contains a definition of the type
+   <tt>'base</tt>&nbsp;<tt>mutyQueueNode</tt> as discussed
+   above. It also contains some tests, worth <b>35 points.</b> Insert your
+   code into this file, then run it with OCaml. When you think your code is
+   correct, then submit your file to Canvas. If you do not know how to submit
+   your work, then please ask your lab TA&rsquo;s. It must be submitted by
+   <b>11:55 <small>PM</small></b> on <b>Tuesday, March 9,
+   2021.</b>
+  </p>
+ </body>
+</html>
