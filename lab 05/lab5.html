@@ -1,0 +1,343 @@
+<!-- Created by Bracy 0.4 on Monday, February 22, 2021 at 10:08 PM CST -->
+<html>
+ <head>
+  <title>
+   CSci 2041 Computer Laboratory 5
+  </title>
+  <style>
+   a:active
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   a:link
+    { color: blue;
+      font-weight: bold;
+      text-decoration: none }
+   a:visited
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   hr
+    { background-color: black;
+      border: none;
+      color: black;
+      height: 1px }
+   table
+    { border-collapse: collapse }
+  </style>
+ </head>
+ <body bgcolor="#FFFFFF">
+  <p align="center">
+   <b>Computer Laboratory 5</b>
+   <br />
+   <b>CS<small>CI</small> 2041: Advanced Programming Principles</b>
+   <br />
+   <b>February 23, 2021</b>
+  </p>
+  <p align="justify">
+   This laboratory assignment asks you to solve some programming puzzles that
+   involve streams. As discussed in the lectures, <i>streams</i> are
+   ordered sequence of elements, implemented using function closures. Although
+   a stream may have an &lsquo;&lsquo;infinite&rsquo;&rsquo; number of
+   elements, only a finite number of those elements are ever computed, and they
+   are computed only as they are needed.
+  </p>
+  <p>
+   <b>1. Theory.</b>
+  </p>
+  <p align="justify">
+   In the lectures, a stream was implemented as an Ocaml tuple
+   <tt>((</tt><i>this</i><tt>,</tt>&nbsp;<i>state</i><tt>),</tt>&nbsp;<i>next</i><tt>)</tt>
+   where <i>this</i> is the first element of the stream, and
+   <i>state</i> is an object that is used to compute the remaining
+   elements of the stream. The function <i>next</i> takes <i>this</i>
+   and <i>state</i> as its arguments, and uses them to compute another
+   Ocaml tuple
+   <tt>(</tt><i>this&#8242;</i><tt>,</tt>&nbsp;<i>state&#8242;</i><tt>)</tt>
+   that is part of a new stream.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The function <tt>makeStream</tt> makes a
+   new stream. The function <tt>first</tt> returns the first element of a
+   stream it&rsquo;s given. It&rsquo;s analogous to <tt>hd</tt> for lists.
+   The function <tt>rest</tt> returns a new stream that is like a stream
+   it&rsquo;s given, but without its first element. It&rsquo;s analogous to
+   <tt>tl</tt> for lists.
+  </p>
+  <blockquote>
+   <p>
+    <tt>let&nbsp;makeStream&nbsp;this&nbsp;state&nbsp;next&nbsp;=&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;((this,&nbsp;state),&nbsp;next)&nbsp;;;&nbsp;</tt>
+    <br />
+    <tt>&nbsp;</tt>
+    <br />
+    <tt>let&nbsp;first&nbsp;((this,&nbsp;state),&nbsp;next)&nbsp;=&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;this&nbsp;;;&nbsp;</tt>
+    <br />
+    <tt>&nbsp;</tt>
+    <br />
+    <tt>let&nbsp;rest&nbsp;((this,&nbsp;state),&nbsp;next)&nbsp;=&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;(next&nbsp;this&nbsp;state,&nbsp;next)&nbsp;;;</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   Note that OCaml functions can use pattern matching in their parameter lists,
+   just as <tt>match</tt>&#8211;<tt>with</tt> does.
+  </p>
+  <p>
+   <b>2. Examples.</b>
+  </p>
+  <p align="justify">
+   For example, we can use <tt>makeStream</tt> to construct an infinite
+   stream of factorials. Its first element is <tt>1</tt> and its state is
+   <tt>1</tt>. The state records the largest factorial computed by the
+   stream so far.
+  </p>
+  <blockquote>
+   <p>
+    <tt>let&nbsp;factorials&nbsp;=&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;makeStream&nbsp;1&nbsp;1&nbsp;(fun&nbsp;this&nbsp;state&nbsp;-&gt;&nbsp;(this&nbsp;&#8727;&nbsp;state,&nbsp;state&nbsp;+&nbsp;1))&nbsp;;;</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   We can then use <tt>first</tt> and <tt>rest</tt> on the stream
+   <tt>factorials</tt> to obtain its members (the arrow
+   &lsquo;&#8658;&rsquo; means <i>returns</i>). Streams are immutable, so
+   the stream <tt>factorials</tt> remains unchanged.
+  </p>
+  <blockquote>
+   <table cellpadding="0" cellspacing="0">
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>first factorials</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>1</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>first (rest factorials)</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>1</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>first (rest (rest factorials))</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>2</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>first (rest (rest (rest factorials)))</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>6</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>first (rest (rest (rest (rest factorials))))</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>24</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       &nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &#8942;
+      </p>
+     </td>
+     <td>
+      <p>
+       &nbsp;
+      </p>
+     </td>
+    </tr>
+   </table>
+  </blockquote>
+  <p align="justify">
+   We can also define a function <tt>take</tt> that returns the first
+   <tt>count</tt> elements of a stream, but as a list. It uses
+   <tt>first</tt> and <tt>rest</tt> in the same way as above.
+  </p>
+  <blockquote>
+   <p>
+    <tt>let&nbsp;rec&nbsp;take&nbsp;count&nbsp;stream&nbsp;=&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;match&nbsp;count&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;with&nbsp;0&nbsp;-&gt;&nbsp;[]&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;-&gt;&nbsp;first&nbsp;stream&nbsp;::&nbsp;take&nbsp;(count&nbsp;&#8722;&nbsp;1)&nbsp;(rest&nbsp;stream)&nbsp;;;</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   As a result,
+   <tt>take</tt>&nbsp;<tt>10</tt>&nbsp;<tt>factorials</tt>
+   returns
+   <tt>[1;&nbsp;1;&nbsp;2;&nbsp;6;&nbsp;24;&nbsp;120;&nbsp;720;&nbsp;5040;&nbsp;40320;&nbsp;362880]</tt>,
+   a list of the first ten factorials. It&rsquo;s more interesting, however, to
+   write functions that take streams as arguments and return new streams as
+   values. Such functions effectively operate on infinitely large data
+   structures, but in finite space and time.
+  </p>
+  <p>
+   <b>3. Implementation.</b>
+  </p>
+  <p align="justify">
+   For this laboratory assignment, you must write OCaml code for the following.
+  </p>
+  <blockquote>
+   <dl compact="compact">
+    <dt>
+     <p>
+      <tt>odds</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Make a stream of odd integers: 1, 3, 5, 7 ... Let the name
+      <tt>odds</tt> be bound to this stream. Hint: do not write a
+      function. Just call <tt>makeStream</tt> and use <tt>let</tt>.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>trim count stream</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Define a function <tt>trim</tt> that returns a new stream like
+      <tt>stream</tt>, but without its first <tt>count</tt> elements.
+      For example,
+      <tt>trim</tt>&nbsp;<tt>5</tt>&nbsp;<tt>odds</tt> must
+      return a stream like <tt>odds</tt>, but without its first five
+      elements, so it contains 11, 13, 15, 17 ... Hint: write a recursion that
+      uses <tt>rest</tt>.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>scale factor stream</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Define a function <tt>scale</tt> that returns a new stream of
+      integers that is like <tt>stream</tt>, but in which each integer is
+      multiplied by <tt>factor</tt>. The function <tt>scale</tt> must
+      run in <i>O</i>(1) time. For example,
+      <tt>scale</tt>&nbsp;<tt>2</tt>&nbsp;<tt>odds</tt> must
+      return a stream containing 2, 6, 10, 14 ... Hint: use
+      <tt>makeStream</tt>, and have the new stream&rsquo;s state be a
+      stream computed from <tt>stream</tt>.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>sum left right</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Define a function <tt>sum</tt> that takes two streams of integers
+      <tt>left</tt> and <tt>right</tt> as its arguments. The function
+      <tt>sum</tt> must return a new stream whose <i>n</i>th element
+      is obtained by adding the <i>n</i>th elements of <tt>left</tt>
+      and <tt>right</tt>, where <i>n</i>&nbsp;&#8805;&nbsp;1. The
+      function <tt>sum</tt> must run in <i>O</i>(1) time. For
+      example, if <tt>ones</tt> is a stream containing 1, 1, 1, 1 ...,
+      then <tt>sum</tt>&nbsp;<tt>ones</tt>&nbsp;<tt>odds</tt>
+      must return a stream containing 2, 4, 6, 8 ... Hint: use
+      <tt>makeStream</tt>, and have the new stream&rsquo;s state be a
+      2-tuple of streams, one computed from <tt>left</tt>, and the other
+      computed from <tt>right</tt>.
+     </p>
+    </dd>
+   </dl>
+  </blockquote>
+  <p align="justify">
+   Some things you need to know for this laboratory assignment have not yet
+   been discussed in lectures. This is because our labs meet at the beginning
+   of the week. In a perfect world (this isn&rsquo;t one) the labs would meet
+   at the end of the week, after everything had been explained. If you
+   don&rsquo;t know how to do parts of this assignment, don&rsquo;t worry. Wait
+   for the next lecture.
+  </p>
+  <p>
+   <b>4. Deliverables.</b>
+  </p>
+  <p align="justify">
+   The file
+   <a href="tests5.ml">
+    <tt>tests5.ml</tt>
+   </a>
+   contains some tests, worth <b>30 points</b>. Insert your code into this
+   file and then run it with OCaml. When you think your code is correct, submit
+   the file with your code in it. It must be submitted on Canvas by <b>11:55
+   <small>PM</small></b> on <b>Tuesday, March 2, 2021</b>. If you
+   do not know how and where to submit your work, then please ask your lab
+   TA&rsquo;s.
+  </p>
+ </body>
+</html>
