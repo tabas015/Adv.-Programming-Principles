@@ -1,0 +1,242 @@
+<!-- Created by Bracy 0.4 on Monday, February 15, 2021 at 7:27 PM CST -->
+<html>
+ <head>
+  <title>
+   CSci 2041 Programming Project 1
+  </title>
+  <style>
+   a:active
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   a:link
+    { color: blue;
+      font-weight: bold;
+      text-decoration: none }
+   a:visited
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   hr
+    { background-color: black;
+      border: none;
+      color: black;
+      height: 1px }
+   table
+    { border-collapse: collapse }
+  </style>
+ </head>
+ <body bgcolor="#FFFFFF">
+  <p align="center">
+   <b>CS<small>CI</small> 2041: Advanced Programming Principles</b>
+   <br />
+   <b>Programming Project 1</b>
+   <br />
+   <b>February 15, 2021</b>
+  </p>
+  <p>
+   <b>0. Introduction.</b>
+  </p>
+  <p align="justify">
+   This is the first programming project of the course. It asks you to write a
+   recursive Mergesort algorithm in OCaml. Unlike most sorting algorithms,
+   Mergesort can be made to work efficiently with linked lists. The algorithm
+   shown here requires <i>O</i>(<i>n</i>&nbsp;log&nbsp;<i>n</i>)
+   time to sort a list of <i>n</i> elements.
+  </p>
+  <p>
+   <b>1. Theory.</b>
+  </p>
+  <p align="justify">
+   The Mergesort algorithm is shown below in English and imperative pseudocode.
+   It takes an unsorted list of integers <i>U</i> as its parameter.
+   (Actually any totally ordered objects will work, not just integers.) It
+   returns another list that is like <i>U,</i> except that its elements
+   are sorted into nondecreasing order.
+  </p>
+  <blockquote>
+   <p>
+    00&nbsp;&nbsp;M<small>ERGESORT</small>&nbsp;<i>U</i>&nbsp;=&nbsp;
+    <br />
+    01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b>&nbsp;<i>U</i>&nbsp;has&nbsp;less&nbsp;than&nbsp;two&nbsp;elements&nbsp;
+    <br />
+    02&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b>&nbsp;<i>U</i>&nbsp;
+    <br />
+    03&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>else</b>&nbsp;
+    <br />
+    04&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>L</i>&nbsp;=&nbsp;an&nbsp;empty&nbsp;list&nbsp;
+    <br />
+    05&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>R</i>&nbsp;=&nbsp;an&nbsp;empty&nbsp;list&nbsp;
+    <br />
+    06&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>while</b>&nbsp;<i>U</i>&nbsp;has&nbsp;two&nbsp;or&nbsp;more&nbsp;elements&nbsp;
+    <br />
+    07&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add&nbsp;the&nbsp;first&nbsp;element&nbsp;of&nbsp;<i>U</i>&nbsp;at&nbsp;the&nbsp;front&nbsp;of&nbsp;<i>L</i>&nbsp;
+    <br />
+    08&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;remove&nbsp;the&nbsp;first&nbsp;element&nbsp;from&nbsp;<i>U</i>&nbsp;
+    <br />
+    09&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add&nbsp;the&nbsp;first&nbsp;element&nbsp;of&nbsp;<i>U</i>&nbsp;at&nbsp;the&nbsp;front&nbsp;of&nbsp;<i>R</i>&nbsp;
+    <br />
+    10&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;remove&nbsp;the&nbsp;first&nbsp;element&nbsp;from&nbsp;<i>U</i>&nbsp;
+    <br />
+    11&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add&nbsp;elements&nbsp;from&nbsp;<i>U</i>&nbsp;to&nbsp;the&nbsp;front&nbsp;of&nbsp;<i>L</i>&nbsp;
+    <br />
+    12&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>L</i>&nbsp;=&nbsp;M<small>ERGESORT</small>&nbsp;<i>L</i>&nbsp;
+    <br />
+    13&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>R</i>&nbsp;=&nbsp;M<small>ERGESORT</small>&nbsp;<i>R</i>&nbsp;
+    <br />
+    14&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>S</i>&nbsp;=&nbsp;an&nbsp;empty&nbsp;list&nbsp;
+    <br />
+    15&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>while</b>&nbsp;<i>L</i>&nbsp;is&nbsp;not&nbsp;empty&nbsp;<b>and</b>&nbsp;<i>R</i>&nbsp;is&nbsp;not&nbsp;empty&nbsp;
+    <br />
+    16&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b>&nbsp;the&nbsp;first&nbsp;element&nbsp;of&nbsp;<i>L</i>&nbsp;&lt;&nbsp;the&nbsp;first&nbsp;element&nbsp;of&nbsp;<i>R</i>&nbsp;
+    <br />
+    17&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add&nbsp;the&nbsp;first&nbsp;element&nbsp;of&nbsp;<i>L</i>&nbsp;at&nbsp;the&nbsp;end&nbsp;of&nbsp;<i>S</i>&nbsp;
+    <br />
+    18&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;remove&nbsp;the&nbsp;first&nbsp;element&nbsp;from&nbsp;<i>L</i>&nbsp;
+    <br />
+    19&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>else</b>&nbsp;
+    <br />
+    20&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add&nbsp;the&nbsp;first&nbsp;element&nbsp;of&nbsp;<i>R</i>&nbsp;at&nbsp;the&nbsp;end&nbsp;of&nbsp;<i>S</i>&nbsp;
+    <br />
+    21&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;remove&nbsp;the&nbsp;first&nbsp;element&nbsp;from&nbsp;<i>R</i>&nbsp;
+    <br />
+    22&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add&nbsp;elements&nbsp;from&nbsp;<i>L</i>&nbsp;at&nbsp;the&nbsp;end&nbsp;of&nbsp;<i>S</i>&nbsp;
+    <br />
+    23&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add&nbsp;elements&nbsp;from&nbsp;<i>R</i>&nbsp;at&nbsp;the&nbsp;end&nbsp;of&nbsp;<i>S</i>&nbsp;
+    <br />
+    24&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b>&nbsp;<i>S</i>
+   </p>
+  </blockquote>
+  <p align="justify">
+   In lines 01&#8211;02, Mergesort tests if <i>U</i> has zero elements, or
+   one element. If so, then <i>U</i> is already sorted, so Mergesort
+   returns <i>U.</i> This is the base case of a recursion. Lines
+   04&#8211;24 are the recursive case.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In lines 04&#8211;11, Mergesort splits
+   <i>U</i> into two lists <i>L</i> and <i>R</i> of
+   approximately equal lengths. This done by removing elements from
+   <i>U</i> and putting them alternately into <i>L</i> and
+   <i>R</i>. If <i>U</i>&rsquo;s length is even, then <i>L</i>
+   and <i>R</i> have the same length. If <i>U</i>&rsquo;s length is
+   odd, then <i>L</i> gets one extra element from <i>U</i> in line
+   11. Note that the order of elements within <i>L,</i> and within
+   <i>R,</i> does not matter.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In lines 12&#8211;13, Mergesort calls itself
+   recursively on <i>L</i> and <i>R</i> to sort them. Since
+   <i>L</i> and <i>R</i> always have fewer elements than
+   <i>U,</i> the lengths of the lists on which Mergesort is called will
+   always decrease. That means Mergesort will always eventually reach its base
+   case in lines 01&#8211;02.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In lines 14&#8211;23, Mergesort combines (or
+   <i>merges</i>) the sorted lists <i>L</i> and <i>R</i> into
+   one sorted list <i>S.</i> It does this by repeatedly choosing the first
+   element of <i>L</i> or <i>R,</i> whichever element is smaller, and
+   adding it to the end of <i>S.</i> Mergesort continues in this way until
+   either <i>L</i> or <i>R</i> is empty. If any elements remain in
+   <i>L</i> and <i>R</i>, it adds them to <i>S</i> in lines
+   22&#8211;23.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Finally, at line 24, Mergesort returns the
+   sorted list <i>S.</i>
+  </p>
+  <p>
+   <b>2. Implementation.</b>
+  </p>
+  <p align="justify">
+   Write an OCaml function called <tt>mergesort</tt> that implements the
+   pseudocode algorithm shown in the previous section. Your function must take
+   a list as its only argument. It must return a sorted copy of the list as its
+   result. Here are some hints.
+  </p>
+  <ul>
+   <li>
+   <p align="justify">
+    You will need at least two helper functions, one to implement the splitting
+    phase of lines 04&#8211;11, and another to implement the combining phase of
+    lines 14&#8211;23. You may need more than two.
+   </p>
+   <li>
+   <p align="justify">
+    Your helper functions need not be tail-recursive. Some might be
+    tail-recursive anyway.
+   </p>
+   <li>
+   <p align="justify">
+    The function <tt>mergesort</tt> and its helpers may be <i>mutually
+    recursive,</i> which means that they can call each other freely. This
+    presents problems in OCaml, which requires that a function must first be
+    defined before it can be called in another function. However, it is
+    possible to write mutually recursive functions by using
+    <tt>let</tt>&nbsp;<tt>rec</tt> along with <tt>and</tt>. For
+    example, two mutually recursive functions <tt>dum</tt> and
+    <tt>dee</tt> can be defined in the following way.
+   </p>
+   <blockquote>
+    <p>
+     <tt>let&nbsp;rec&nbsp;dum&nbsp;n&nbsp;=&nbsp;</tt>
+     <br />
+     <tt>&nbsp;&nbsp;if&nbsp;n&nbsp;&gt;&nbsp;0&nbsp;</tt>
+     <br />
+     <tt>&nbsp;&nbsp;then&nbsp;dee&nbsp;(n&nbsp;&#8722;&nbsp;1)&nbsp;</tt>
+     <br />
+     <tt>&nbsp;&nbsp;else&nbsp;()&nbsp;</tt>
+     <br />
+     <tt>and&nbsp;dee&nbsp;n&nbsp;=&nbsp;</tt>
+     <br />
+     <tt>&nbsp;&nbsp;if&nbsp;n&nbsp;&gt;&nbsp;0&nbsp;</tt>
+     <br />
+     <tt>&nbsp;&nbsp;then&nbsp;dum&nbsp;(n&nbsp;&#8722;&nbsp;1)&nbsp;</tt>
+     <br />
+     <tt>&nbsp;&nbsp;else&nbsp;()</tt>
+    </p>
+   </blockquote>
+   <p align="justify">
+    For example, <tt>dum</tt> calls <tt>dee</tt>, then
+    <tt>dee</tt> calls <tt>dum</tt>, etc., until finally
+    <tt>n</tt> becomes <tt>0</tt>. The functions <tt>dum</tt>
+    and <tt>dee</tt> do nothing useful, and are unrelated to
+    <tt>mergesort</tt>, but they show how mutual recursions can be written
+    in OCaml. Any number of mutually recursive functions can be written using
+    <tt>and</tt>&rsquo;s.
+   </p>
+   <li>
+   <p align="justify">
+    You must not use loops or variables in your <tt>mergesort</tt>
+    function, even though OCaml provides them. If you use loops or variables in
+    any way, then you will receive <small>ZERO POINTS</small> for this
+    project.
+   </p>
+   <li>
+   <p align="justify">
+    There are no test cases provided along with this project. However, you may
+    want to write your own test cases for <tt>mergesort</tt> and its
+    helpers, to make sure they work.
+   </p>
+  </ul>
+  <p align="justify">
+   Note that unlike the lab assignments, you have relatively little guidance
+   about how to write <tt>mergesort</tt>. Although you can ask all the
+   questions you like, you&rsquo;re on your own here!
+  </p>
+  <p>
+   <b>3. Deliverables.</b>
+  </p>
+  <p align="justify">
+   Unlike the lab assignments, <b><small>YOU ARE NOT ALLOWED TO WORK WITH A
+   PARTNER ON THIS PROJECT</small>.</b> Although you may discuss the
+   project with others in a general way, <b><small>IT MUST BE WRITTEN
+   ENTIRELY BY YOURSELF</small>.</b> The TA&rsquo;s will grade your
+   project by reading your OCaml code in detail.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The project will be due on Canvas at
+   <b>11:55 <small>PM</small></b> on <b>March 1, 2021</b>. It is
+   worth <b>40 points</b>. You must submit only one file, containing your
+   OCaml code and test cases. Any output, resulting from running test cases,
+   must appear in a comment at the end of your file. If you do not know how to
+   turn in your work, then please ask your lab TA&rsquo;s.
+  </p>
+ </body>
+</html>
