@@ -1,0 +1,261 @@
+<!-- Created by Bracy 0.4 on Monday, March 8, 2021 at 10:51 PM CST -->
+<html>
+ <head>
+  <title>
+   CSci 2041 Computer Laboratory 7
+  </title>
+  <style>
+   a:active
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   a:link
+    { color: blue;
+      font-weight: bold;
+      text-decoration: none }
+   a:visited
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   hr
+    { background-color: black;
+      border: none;
+      color: black;
+      height: 1px }
+   table
+    { border-collapse: collapse }
+  </style>
+ </head>
+ <body bgcolor="#FFFFFF">
+  <p align="center">
+   <b>Computer Laboratory 7</b>
+   <br />
+   <b>CS<small>CI</small> 2041: Advanced Programming Principles</b>
+   <br />
+   <b>March 9, 2021</b>
+  </p>
+  <p>
+   <b>0. Introduction.</b>
+  </p>
+  <p align="justify">
+   In this laboratory assignment, you will write functions that implement a
+   hash table which resolves collisions by chaining. (You may have discussed
+   such hash tables in a data structures course before CS<small>CI</small>
+   2041.) It is similar to the hash table that was discussed in the lectures
+   for use in memoization. However, this hash table is implemented in a
+   somewhat different way, using mutable objects that contain variables.
+  </p>
+  <p>
+   <b>1. Theory.</b>
+  </p>
+  <p align="justify">
+   A <i>hash table</i> is a data structure that maps <i>keys</i> to
+   their <i>values.</i> It supports operations that (1) add a new key and
+   value to the table, (2) change the value associated with a key, and (3)
+   delete a key and its value entirely.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; One way to implement a hash table uses an
+   array. Each element of the array is a linear linked list of nodes, called a
+   <i>bucket.</i> Each node in the bucket contains a key, its value, and a
+   pointer to the next node in the bucket (if there is one). The pointer to the
+   next node lets us access the remaining nodes in the bucket that follow the
+   first node.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Now suppose that we want to find the value
+   associated with a key. We call a <i>hash function</i> on the key,
+   giving an index into the array. Then we obtain a bucket from the array at
+   that index. We search the bucket for a node that contains the key. If we
+   find it, then the node will also contain the key&rsquo;s value. If we
+   don&rsquo;t find it, then the hash table assigns no value to the key.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The buckets are needed because the hash
+   function may send many different keys to the same bucket. This is called a
+   <i>collision.</i> However, if the hash function is correctly designed,
+   then each key has an approximately equal probability of being sent to any
+   bucket within the array. If we make the array big enough, then most buckets
+   will either be empty, or will have only one or two nodes.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; As a result, buckets can be searched very
+   quickly. It is possible to implement a hash table so that its operations can
+   be performed in <i>O</i>(1) key comparisons, on average.
+  </p>
+  <p>
+   <b>2. Implementation.</b>
+  </p>
+  <p align="justify">
+   For this laboratory assignment, you will implement a hash table as an array
+   of buckets, as described in the previous section. You must write an OCaml
+   type and a few OCaml functions, described below. Unlike most Ocaml code
+   written for this course, you will use variables to avoid copying.
+  </p>
+  <blockquote>
+   <dl compact="compact">
+    <dt>
+     <p>
+      <tt>('key, 'value) pair</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      The type <tt>pair</tt> describes a list of key-value pairs for each
+      hash table bucket. It must have two constructors, called
+      <tt>NoPair</tt> and <tt>Pair</tt>. The constructor
+      <tt>NoPair</tt> makes a <tt>pair</tt> with no parts,
+      representing an empty list of <tt>pair</tt>&rsquo;s. The constructor
+      <tt>Pair</tt> makes a <tt>pair</tt> with three parts: a
+      <tt>key</tt>, a variable that holds a <tt>value</tt>, and a
+      variable that holds a pointer to the next <tt>pair</tt> in the
+      bucket. Since the <tt>value</tt> and the next <tt>pair</tt> are
+      variables, they can be changed by assignment.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>hashDelete table key</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Use the function <tt>hash</tt> to find a bucket in
+      <tt>table</tt>. Search that bucket for a <tt>Pair</tt> that
+      contains <tt>key</tt>. If there is such a <tt>Pair</tt>, then
+      delete it from the bucket. If there is no such <tt>Pair</tt>, then
+      do nothing. Hint: do not copy the <tt>Pair</tt>&rsquo;s in the
+      bucket, but rather delete only the <tt>Pair</tt> that contains
+      <tt>key</tt>. See below for a longer version of this hint.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>hashGet table key</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Use the function <tt>hash</tt> to find a bucket in
+      <tt>table</tt>. Search that bucket for a <tt>Pair</tt> that
+      contains <tt>key</tt> and its value. Return that value. If there is
+      no such <tt>Pair</tt>, then raise the exception
+      <tt>NoSuchKey</tt>. Hint: the value will be a variable, so make sure
+      to return the variable&rsquo;s value, not the variable itself.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>hashHas table key</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Use the function <tt>hash</tt> to find a bucket in
+      <tt>table</tt>. Search that bucket for a <tt>Pair</tt> that
+      contains <tt>key</tt>. If there is such a <tt>Pair</tt>, then
+      return <tt>true</tt>, otherwise return <tt>false</tt>. Hint:
+      this will be much like <tt>hashGet</tt>.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>hashPut table key value</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Use the function <tt>hash</tt> to find a bucket in
+      <tt>table</tt>. Search that bucket for a <tt>Pair</tt> that
+      contains <tt>key</tt> and a variable that contains its value. If
+      there is such a <tt>Pair</tt>, then reset the variable to
+      <tt>value</tt>. If there is no such <tt>Pair</tt>, then add a
+      new <tt>Pair</tt> to the front of the bucket. It contains
+      <tt>key</tt> and a variable whose value is <tt>value</tt>.
+     </p>
+    </dd>
+   </dl>
+  </blockquote>
+  <p align="justify">
+   Here are two helper functions that may be useful. The function
+   <tt>hashMake</tt> returns a hash table. It is implemented as an array
+   of length <tt>modulus</tt> whose elements are empty buckets
+   (<tt>NoPair</tt>). Here <tt>modulus</tt> is assumed to be a prime
+   number.
+  </p>
+  <blockquote>
+   <p>
+    <tt>let&nbsp;hashMake&nbsp;modulus&nbsp;=&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;Array.make&nbsp;modulus&nbsp;NoPair&nbsp;;;</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   The function <tt>hash</tt> returns the index of a bucket within
+   <tt>table</tt> that may have a <tt>Pair</tt> containing
+   <tt>key</tt>. Here <tt>table</tt> was created by calling
+   <tt>hashMake</tt>.
+  </p>
+  <blockquote>
+   <p>
+    <tt>let&nbsp;hash&nbsp;table&nbsp;key&nbsp;=&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;abs&nbsp;((Hashtbl.hash&nbsp;key)&nbsp;mod&nbsp;(Array.length&nbsp;table))&nbsp;;;</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   And here is a hint about how to write <tt>hashDelete</tt>. Use a helper
+   function, which might be called <tt>hashDeleting</tt>, to search a
+   bucket from <tt>table</tt>. The function <tt>hashDeleting</tt> has
+   three possible cases.
+  </p>
+  <ol>
+   <li>
+   <p align="justify">
+    If the bucket is empty, then return an empty bucket (<tt>NoPair</tt>).
+   </p>
+   <li>
+   <p align="justify">
+    If the first <tt>Pair</tt> in the bucket contains <tt>key</tt>,
+    then return the rest of the bucket, not including the first
+    <tt>Pair</tt>. There is a pointer to the rest of the bucket in the
+    first <tt>Pair.</tt>
+   </p>
+   <li>
+   <p align="justify">
+    If the first <tt>Pair</tt> in the bucket does not contain
+    <tt>key</tt>, then call <tt>hashDeleting</tt> on the rest of the
+    bucket. Set pointer to the rest of the bucket, in the first
+    <tt>Pair</tt>, to the result returned by <tt>hashDeleting</tt>.
+   </p>
+  </ol>
+  <p align="justify">
+   The function <tt>hashDelete</tt> should use <tt>hash</tt> to find
+   the bucket in <tt>table</tt> that may contain <tt>key</tt>. It
+   then calls <tt>hashDeleting</tt> on that bucket. It finally replaces
+   the original bucket in <tt>table</tt> with the result returned from
+   <tt>hashDeleting</tt>. In this way, <tt>hashDelete</tt> can delete
+   the first <tt>pair</tt> from the bucket, in the same way that it
+   deletes any other <tt>Pair</tt>, without needing a special case.
+  </p>
+  <p>
+   <b>3. Deliverables.</b>
+  </p>
+  <p align="justify">
+   The file
+   <a href="tests7.ml">
+    <tt>tests7.ml</tt>
+   </a>
+   contains definitions of some helper functions along with some tests, worth
+   <b>45 points.</b> Insert your code into this file, then run it with
+   OCaml. When you think your code is correct, submit it to Gradescope and/or
+   Canvas. If you do not know how to submit your work, then please ask your lab
+   TA&rsquo;s. It must be submitted by <b>11:55 <small>PM</small></b>
+   on <b>Tuesday, March 16, 2021</b>.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; N<small>OTE</small>: increasing numbers
+   of students have asked for more time to submit their work, claiming that
+   they have &lsquo;&lsquo;submitted the wrong file.&rsquo;&rsquo; We are
+   unsympathetic to most such claims, because this excuse is often used by
+   cheaters to get additional time they are not entitled to. Please check that
+   you have submitted the correct file when you turn in your work! This
+   probably takes no more effort than a couple of mouse clicks. Thanks.
+  </p>
+ </body>
+</html>
