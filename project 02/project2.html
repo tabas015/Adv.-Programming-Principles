@@ -1,0 +1,909 @@
+<!-- Created by Bracy 0.4 on Tuesday, March 9, 2021 at 10:12 PM CST -->
+<html>
+ <head>
+  <title>
+   CSci 2041 Programming Project 2
+  </title>
+  <style>
+   a:active
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   a:link
+    { color: blue;
+      font-weight: bold;
+      text-decoration: none }
+   a:visited
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   hr
+    { background-color: black;
+      border: none;
+      color: black;
+      height: 1px }
+   table
+    { border-collapse: collapse }
+  </style>
+ </head>
+ <body bgcolor="#FFFFFF">
+  <p align="center">
+   <b>Programming Project 2</b>
+   <br />
+   <b>CS<small>CI</small> 2041 Advanced Programming</b>
+   <br />
+   <b>March 10, 2021</b>
+  </p>
+  <p>
+   <b>0. Introduction.</b>
+  </p>
+  <p align="justify">
+   <i>Propositional logic</i> is a branch of mathematics that deals with
+   the Boolean constants <i>true</i> and <i>false,</i> with variables
+   that have Boolean values, and with the Boolean operators &#172; (not),
+   &#8743; (and), &#8744; (or), &#8594; (implication), and &#8596;
+   (equivalence). An expression constructed from these constants, variables,
+   and operators has a value that depends on the values of its variables. For
+   example, the expression
+   <i>a</i>&nbsp;&#8744;&nbsp;(<i>b</i>&nbsp;&#8743;&nbsp;<i>c</i>)
+   is <i>true</i> if <i>a</i> is <i>true,</i> or if both
+   <i>b</i> and <i>c</i> are <i>true;</i> it is
+   <i>false</i> otherwise. An expression is a <i>tautology</i> if it
+   is <i>true</i> for all possible values of its variables. For example,
+   the expression
+   &#172;&nbsp;(<i>p</i>&nbsp;&#8743;&nbsp;<i>q</i>)&nbsp;&#8594;&nbsp;(&#172;&nbsp;<i>p</i>&nbsp;&#8744;&nbsp;&#172;&nbsp;<i>q</i>)
+   is a tautology, because it is <i>true</i> for all Boolean values of its
+   variables <i>p</i> and <i>q.</i>
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; We can prove that an expression is a
+   tautology by using rules about Boolean operators. Unfortunately, there are
+   many such rules: a text used in the Discrete Mathematics course
+   (CS<small>CI</small> 2011) here at the University shows about 35 of
+   them. Using these rules requires creativity and luck. It&rsquo;s possible to
+   write a program that uses them to prove an expression is a tautology, but
+   it&rsquo;s difficult. However, it&rsquo;s easy to write such a program if we
+   use only one operator, called <small>IF</small>, because it uses only
+   five rules that can be applied by an algorithm. In this programming project,
+   you will write an OCaml program that tests if a Boolean expression is a
+   tautology, using rules about <small>IF</small>&rsquo;s.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Before we proceed, here&rsquo;s a warning. In
+   the past, we&rsquo;ve discussed writing a tautology checker for
+   propositional logic in OCaml. However, <small>THE PROGRAM YOU WILL WRITE
+   FOR THIS PROJECT IS COMPLETELY DIFFERENT FROM THE ONE IN THE
+   LECTURES</small>!
+  </p>
+  <p>
+   <b>1. Theory.</b>
+  </p>
+  <p align="justify">
+   An <small>IF</small> term is written as
+   (<small>IF</small>&nbsp;&#960;&nbsp;&#945;&nbsp;&#946;), where each of
+   &#960;, &#945;, and &#946; is either <i>true</i>, <i>false</i>, a
+   variable, or another <small>IF</small> term. It acts much like an
+   <tt>if</tt>&#8211;<tt>then</tt>&#8211;<tt>else</tt>
+   expression in OCaml. If &#960; is <i>true</i>, then
+   (<small>IF</small>&nbsp;&#960;&nbsp;&#945;&nbsp;&#946;) is &#945;. If
+   &#960; is <i>false</i>, then
+   (<small>IF</small>&nbsp;&#960;&nbsp;&#945;&nbsp;&#946;) is &#946;.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; We can express the familiar operators of
+   propositional logic using <small>IF</small>&rsquo;s. Rules
+   <b>1</b> through <b>5</b> show how to do that. In each rule, the
+   expression on the left side of the arrow &lsquo;&#8658;&rsquo; is replaced
+   by the expression on the right side. (It may help to remember that
+   &#945;&nbsp;&#8594;&nbsp;&#946; acts like
+   &#172;&nbsp;&#945;&nbsp;&#8744;&nbsp;&#946;, and
+   &#945;&nbsp;&#8596;&nbsp;&#946; acts like &#945;&nbsp;=&nbsp;&#946;).
+  </p>
+  <blockquote>
+   <table cellpadding="0" cellspacing="0">
+    <tr valign="top">
+     <td>
+      <p>
+       <b>1</b>&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       &#172; &#945;
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       (<small>IF</small> &#945; <i>false true</i>)
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       <b>2</b>&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       &#945; &#8743; &#946;
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       (<small>IF</small> &#945; &#946; <i>false</i>)
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       <b>3</b>&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       &#945; &#8744; &#946;
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       (<small>IF</small> &#945; <i>true</i> &#946;)
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       <b>4</b>&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       &#945; &#8594; &#946;
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       (<small>IF</small> &#945; &#946; <i>true</i>)
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       <b>5</b>&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       &#945; &#8596; &#946;
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       (<small>IF</small> &#945; &#946; (<small>IF</small> &#946;
+       <i>false true</i>))
+      </p>
+     </td>
+    </tr>
+   </table>
+  </blockquote>
+  <p align="justify">
+   The first argument of an <small>IF</small> is called its
+   <i>test</i>. The problem with rules <b>1</b> through <b>5</b>
+   is that they can create <small>IF</small>&rsquo;s whose tests are other
+   <small>IF</small>&rsquo;s. These <small>IF</small>&rsquo;s are
+   hard to work with. As a result, we use rule <b>6</b> to rewrite an
+   <small>IF</small> so its test is always a Boolean constant or a
+   variable. After rule <b>6</b> has been used as many times as possible
+   on an <small>IF</small>, so all its tests are either Boolean constants
+   or variables, we say that the <small>IF</small> is in <i>normal
+   form</i>, or that it has been <i>normalized.</i>
+  </p>
+  <blockquote>
+   <p>
+    <b>6</b>&nbsp;&nbsp; (<small>IF</small> (<small>IF</small>
+    &#960; &#945;<sub>1</sub> &#946;<sub>1</sub>)
+    &#945;<sub>2</sub> &#946;<sub>2</sub>)
+    &nbsp;&nbsp;&#8658;&nbsp;&nbsp; (<small>IF</small> &#960;
+    (<small>IF</small> &#945;<sub>1</sub> &#945;<sub>2</sub>
+    &#946;<sub>2</sub>) (<small>IF</small> &#946;<sub>1</sub>
+    &#945;<sub>2</sub> &#946;<sub>2</sub>))
+   </p>
+  </blockquote>
+  <p align="justify">
+   Now, rules <b>7</b> through <b>11</b> can simplify normalized
+   <small>IF</small>&rsquo;s easily&#8212;these are the five rules that we
+   mentioned in the introduction. In rule <b>11</b>,
+   &#966;{&#960;&nbsp;&#8658;&nbsp;&#947;} is an expression like &#966;, except
+   that each appearance of the variable &#960; within it is replaced by &#947;.
+  </p>
+  <blockquote>
+   <table cellpadding="0" cellspacing="0">
+    <tr valign="top">
+     <td>
+      <p>
+       <b>7</b>&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       (<small>IF</small> <i>true</i> &#945; &#946;)
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       &#945;
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       <b>8</b>&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       (<small>IF</small> <i>false</i> &#945; &#946;)
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       &#946;
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       <b>9</b>&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       (<small>IF</small> &#960; <i>true false</i>)
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       &#960;
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       <b>10</b>&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       (<small>IF</small> &#960; &#945; &#945;)
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       &#945;
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       <b>11</b>&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       (<small>IF</small> &#960; &#945; &#946;)
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       (<small>IF</small> &#960; &#945;{&#960; &#8658; <i>true</i>}
+       &#946;{&#960; &#8658; <i>false</i>})
+      </p>
+     </td>
+    </tr>
+   </table>
+  </blockquote>
+  <p align="justify">
+   These rules work just as we would expect them to, if we know how
+   <small>IF</small>&rsquo;s work. Rules <b>7</b> and <b>8</b>
+   just choose &#945; or &#946;. Rule <b>9</b> says that if we return
+   <i>true</i> when &#960; is <i>true</i>, and <i>false</i> when
+   &#960; is <i>false</i>, then we don&rsquo;t need an
+   <small>IF</small>. Rule <b>10</b> says that if we choose between
+   two identical alternatives, then we also don&rsquo;t need an
+   <small>IF</small>. And rule <b>11</b> says that we know &#960; is
+   true if we choose &#945;, and that &#960; is <i>false</i> if we choose
+   &#946;.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; We&rsquo;ve now built enough mathematical
+   machinery to design an algorithm that tests if an expression from
+   propositional logic is a tautology. Here&rsquo;s how it works. First, we use
+   rules <b>1</b> through <b>5</b> to turn the expression into a
+   nested <small>IF</small>. Then we use rule <b>6</b> to normalize
+   the <small>IF</small>. Finally, we use rules <b>7</b> through
+   <b>11</b> to simplify the normalized <small>IF</small> as much as
+   possible. If if simplifies to <i>true</i>, then the expression is a
+   tautology. If it simplifies to <i>false</i>, or to an
+   <small>IF</small> that cannot be simplified any further, then it
+   isn&rsquo;t a tautology.
+  </p>
+  <p>
+   <b>2. Example.</b>
+  </p>
+  <p align="justify">
+   Here&rsquo;s an example of the algorithm in action. Suppose we want to know
+   if the following expression from propositional logic is a tautology. Maybe
+   this is a question from a CS<small>CI</small> 2011 assignment&#8212;if
+   so, then students taking that course could use the algorithm to cheat.
+  </p>
+  <blockquote>
+   <p>
+    &#172; (<i>p</i> &#8743; <i>q</i>) &#8594; (&#172; <i>p</i>
+    &#8744; &#172; <i>q</i>)
+   </p>
+  </blockquote>
+  <p align="justify">
+   We use rules <b>1</b> through <b>5</b> to write this expression
+   using <small>IF</small>&rsquo;s. (In the program you will write, the
+   OCaml function <tt>ifify</tt> will do this.) When the rules have done
+   their work, we end up with a nested <small>IF</small> that looks like
+   this.
+  </p>
+  <blockquote>
+   <p>
+    (<small>IF</small>&nbsp;
+    <br />
+    &nbsp;&nbsp;(<small>IF</small>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>p</i>&nbsp;<i>q</i>&nbsp;<i>false</i>)&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<i>false</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<i>true</i>)&nbsp;
+    <br />
+    &nbsp;&nbsp;(<small>IF</small>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>p</i>&nbsp;<i>false</i>&nbsp;<i>true</i>)&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<i>true</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>q</i>&nbsp;<i>false</i>&nbsp;<i>true</i>))&nbsp;
+    <br />
+    &nbsp;&nbsp;<i>true</i>)
+   </p>
+  </blockquote>
+  <p align="justify">
+   Unfortunately this expression has tests that are
+   <small>IF</small>&rsquo;s. Before we can simplify it, we must normalize
+   it by using rule <b>6</b> a few times. (In the program you will write,
+   the OCaml function <tt>normalize</tt> will do this.) We end up with the
+   following normalized, nested <small>IF</small>.
+  </p>
+  <blockquote>
+   <p>
+    (<small>IF</small>&nbsp;<i>p</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;(<small>IF</small>&nbsp;<i>q</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>false</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>p</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>false</i>&nbsp;<i>true</i>&nbsp;(<small>IF</small>&nbsp;<i>q</i>&nbsp;<i>false</i>&nbsp;<i>true</i>))&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>true</i>&nbsp;<i>true</i>&nbsp;(<small>IF</small>&nbsp;<i>q</i>&nbsp;<i>false</i>&nbsp;<i>true</i>)))&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>true</i>)&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>true</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>p</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>false</i>&nbsp;<i>true</i>&nbsp;(<small>IF</small>&nbsp;<i>q</i>&nbsp;<i>false</i>&nbsp;<i>true</i>))&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>true</i>&nbsp;<i>true</i>&nbsp;(<small>IF</small>&nbsp;<i>q</i>&nbsp;<i>false</i>&nbsp;<i>true</i>)))&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<i>true</i>))&nbsp;
+    <br />
+    &nbsp;&nbsp;(<small>IF</small>&nbsp;<i>false</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>false</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>p</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>false</i>&nbsp;<i>true</i>&nbsp;(<small>IF</small>&nbsp;<i>q</i>&nbsp;<i>false</i>&nbsp;<i>true</i>))&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>true</i>&nbsp;<i>true</i>&nbsp;(<small>IF</small>&nbsp;<i>q</i>&nbsp;<i>false</i>&nbsp;<i>true</i>)))&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<i>true</i>)&nbsp;
+    <br />
+    &nbsp;&nbsp;(<small>IF</small>&nbsp;<i>true</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>p</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>false</i>&nbsp;<i>true</i>&nbsp;(<small>IF</small>&nbsp;<i>q</i>&nbsp;<i>false</i>&nbsp;<i>true</i>))&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<small>IF</small>&nbsp;<i>true</i>&nbsp;<i>true</i>&nbsp;(<small>IF</small>&nbsp;<i>q</i>&nbsp;<i>false</i>&nbsp;<i>true</i>)))&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<i>true</i>)))
+   </p>
+  </blockquote>
+  <p align="justify">
+   Don&rsquo;t be scared by the length and complexity of this nested
+   <small>IF</small>! You don&rsquo;t need to know how it works, or what
+   it does: that&rsquo;s the job of the program you&rsquo;re writing for this
+   project. For now, you only need to know that there are many obvious ways in
+   which it could be simplified.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Using rules <b>7</b> through
+   <b>11</b>, this nested <small>IF</small> can be simplified all the
+   way down to <i>true</i>. (In the program you will write, the OCaml
+   function <tt>simplify</tt> will do this.) That means the original
+   expression was a tautology. You might have known that it was, even without
+   using rules, by recalling De Morgan&rsquo;s laws.
+  </p>
+  <p>
+   <b>3. Implementation.</b>
+  </p>
+  <p align="justify">
+   The rules in previous sections can be applied mechanically, without having
+   to understand them. That means they can be the basis for an automatic
+   tautology testing program. For this project, you must write such a program
+   in OCaml. Your program must use this Ocaml type to represent expressions
+   from propositional logic.
+  </p>
+  <blockquote>
+   <p>
+    <tt>type&nbsp;proposition&nbsp;=&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;False&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;True&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;Var&nbsp;of&nbsp;string&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;And&nbsp;of&nbsp;proposition&nbsp;&#8727;&nbsp;proposition&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;Or&nbsp;of&nbsp;proposition&nbsp;&#8727;&nbsp;proposition&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;Not&nbsp;of&nbsp;proposition&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;Imply&nbsp;of&nbsp;proposition&nbsp;&#8727;&nbsp;proposition&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;Equiv&nbsp;of&nbsp;proposition&nbsp;&#8727;&nbsp;proposition&nbsp;;;</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   Constructors from the type <tt>proposition</tt> represent expressions
+   from propositional logic in the following way, where the squiggly arrow
+   &lsquo;&#8605;&rsquo; means <i>is represented as</i>. Lower case
+   letters <i>a</i>, <i>b</i>, <i>c</i> ..., are propositional
+   variables.
+  </p>
+  <blockquote>
+   <table cellpadding="0" cellspacing="0">
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <i>false</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8605;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>False</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <i>true</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8605;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>True</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <i>a</i>, <i>b</i>, <i>c</i> ...
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8605;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>Var "a"</tt>, <tt>Var "b"</tt>, <tt>Var "c"</tt> ...
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       &#172; &#945;
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8605;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>Not</tt> &#945;
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       &#945; &#8743; &#946;
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8605;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>And (</tt>&#945;<tt>,</tt>&#946;<tt>)</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       &#945; &#8744; &#946;
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8605;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>Or (</tt>&#945;<tt>,</tt>&#946;<tt>)</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       &#945; &#8594; &#946;
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8605;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>Imply (</tt>&#945;<tt>,</tt>&#946;<tt>)</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       &#945; &#8596; &#946;
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8605;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>Equiv (</tt>&#945;<tt>,</tt>&#946;<tt>)</tt>
+      </p>
+     </td>
+    </tr>
+   </table>
+  </blockquote>
+  <p align="justify">
+   Your program must also use this OCaml type to represent
+   <small>IF</small>&rsquo;s.
+  </p>
+  <blockquote>
+   <p>
+    <tt>type&nbsp;conditional&nbsp;=&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;IffyFalse&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;IffyTrue&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;IffyVar&nbsp;of&nbsp;string&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;If&nbsp;of&nbsp;conditional&nbsp;&#8727;&nbsp;conditional&nbsp;&#8727;&nbsp;conditional&nbsp;;;</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   Constructors from the type <tt>conditional</tt> represent
+   <small>IF</small>&rsquo;s in the following way. OCaml&rsquo;s type
+   rules say that we can&rsquo;t use the same constructor names in the types
+   <tt>proposition</tt> and <tt>conditional</tt>, so some
+   constructors must be prefixed by <tt>Iffy</tt>.
+  </p>
+  <blockquote>
+   <table cellpadding="0" cellspacing="0">
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <i>false</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8605;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>IffyFalse</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <i>true</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8605;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>IffyTrue</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <i>a</i>, <i>b</i>, <i>c</i> ...
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8605;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>IffyVar "a"</tt>, <tt>IffyVar "b"</tt>, <tt>IffyVar
+       "c"</tt> ...
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       (<small>IF</small> &#960; &#945; &#946;)
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8605;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>If (</tt>&#960;<tt>,</tt> &#945;<tt>,</tt>
+       &#946;<tt>)</tt>
+      </p>
+     </td>
+    </tr>
+   </table>
+  </blockquote>
+  <p align="justify">
+   Your program must also have at least the following major functions. To
+   simplify grading, you must use the same function names that are shown here,
+   but you need not use the same parameter names.
+  </p>
+  <blockquote>
+   <dl compact="compact">
+    <dt>
+     <p>
+      <tt>ifify p</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      (10 points.) Here <tt>p</tt> is a propositional expression
+      represented as an instance of the OCaml type <tt>proposition</tt>.
+      Translate <tt>p</tt> to an equivalent <small>IF</small>,
+      represented as an instance of the Ocaml type <tt>conditional</tt>,
+      using rules <b>1</b> through <b>5</b>. Return that
+      <small>IF</small>. It is not normalized.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>normalize c</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      (10 points.) Here <tt>c</tt> is an <small>IF</small>,
+      represented as an instance of the OCaml type <tt>conditional</tt>,
+      which might have been returned from <tt>ifify</tt>. Translate
+      <tt>c</tt> to an equivalent normalized <small>IF</small>,
+      represented as an instance of the OCaml type <tt>conditional</tt>,
+      using rule <b>6</b>. Return that <small>IF</small>.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>simplify c</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      (10 points.) Here <tt>c</tt> is a normalized <small>IF</small>,
+      represented as an instance of the OCaml type <tt>conditional</tt>,
+      which might have been returned from <tt>normalize</tt>. Simplify
+      <tt>c</tt> using rules <b>7</b> through <b>11</b>, and
+      return the result, which is also represented as an instance of the OCaml
+      type <tt>conditional</tt>.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>substitute c v b</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      (5 points.) This is a helper function for <tt>simplify</tt>. Here
+      <tt>c</tt> is a normalized <small>IF</small>, represented as an
+      instance of the OCaml type <tt>conditional</tt>. Also,
+      <tt>v</tt> is a variable name, and <tt>b</tt> is a Boolean
+      value, both represented as instances of the OCaml type
+      <tt>conditional</tt>. Return
+      <tt>c</tt>{<tt>v</tt>&nbsp;&#8658;&nbsp;<tt>b</tt>}. In
+      other words, return a new <small>IF</small> that is like
+      <tt>c</tt>, but in which each appearance of <tt>v</tt> is
+      replaced by <tt>b</tt>.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>tautology p</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      (5 points.) Here <tt>p</tt> is a propositional expression
+      represented as an instance of the OCaml type <tt>proposition</tt>.
+      Return <tt>true</tt> if <tt>p</tt> is a tautology, and return
+      <tt>false</tt> otherwise. This function must use
+      <tt>ifify</tt>, <tt>normalize</tt>, and <tt>simplify</tt>
+      as helpers.
+     </p>
+    </dd>
+   </dl>
+  </blockquote>
+  <p align="justify">
+   Here are some hints. All these functions, except <tt>tautology</tt>,
+   will call themselves recursively. Each recursive case will correspond to a
+   different rule: the base case will occur when no more rules can be applied.
+   The recursions make sure that the rules are applied as many times as needed.
+   There is probably no way to make these functions completely tail recursive.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In the part of <tt>simplify</tt> that
+   handles rule <b>10</b>, you may use the OCaml operator
+   &lsquo;<tt>=</tt>&rsquo; to test if the two parts of the
+   <small>IF</small> are equal. However, if you do that, then your program
+   may not be able to prove that certain expressions are tautologies. For
+   example,
+   (<small>IF</small>&nbsp;<i>a</i>&nbsp;<i>b</i>&nbsp;<i>false</i>)
+   and
+   (<small>IF</small>&nbsp;<i>b</i>&nbsp;<i>a</i>&nbsp;<i>false</i>)
+   should be considered equal because they have the same Boolean values for all
+   <i>a</i> and <i>b</i>, but they will not be considered equal by
+   &lsquo;<tt>=</tt>&rsquo;. For people who like to think about such
+   things, there is a way to test two <small>IF</small>&rsquo;s like these
+   for equality, using only the functions defined here. You won&rsquo;t get
+   more points for implementing that test, however&#8212;sorry.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Of course you may define additional helper
+   functions if you need them. Also, code for the OCaml types
+   <tt>conditional</tt> and <tt>proposition</tt> is available on the
+   file
+   <a href="tautyTypes.ml">
+    <tt>tautyTypes.ml</tt>
+   </a>
+   , along with some example propositions.
+  </p>
+  <p>
+   <b>4. Deliverables.</b>
+  </p>
+  <p align="justify">
+   Unlike the lab assignments, <b><small>YOU ARE NOT ALLOWED TO WORK WITH A
+   PARTNER ON THIS PROJECT</small></b>. Although you may discuss the
+   project with others in a general way, <b><small>IT MUST BE WRITTEN
+   ENTIRELY BY YOURSELF</small>.</b> The project is worth <b>40
+   points</b>, and will be due at <b>11:55 <small>PM</small></b>
+   on <b>March 24, 2021</b>. Submit only one file, containing your OCaml
+   code. Any output, resulting from running test cases, must appear in comments
+   at the end of your file. If you do not know how or where to turn in your
+   work, the please ask your lab TA.
+  </p>
+ </body>
+</html>
