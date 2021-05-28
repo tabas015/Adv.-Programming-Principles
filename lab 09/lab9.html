@@ -1,0 +1,318 @@
+<!-- Created by Bracy 0.4 on Monday, March 22, 2021 at 10:36 PM CDT -->
+<html>
+ <head>
+  <title>
+   CSci 2041 Computer Laboratory 9
+  </title>
+  <style>
+   a:active
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   a:link
+    { color: blue;
+      font-weight: bold;
+      text-decoration: none }
+   a:visited
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   hr
+    { background-color: black;
+      border: none;
+      color: black;
+      height: 1px }
+   table
+    { border-collapse: collapse }
+  </style>
+ </head>
+ <body bgcolor="#FFFFFF">
+  <p align="center">
+   <b>Computer Laboratory 9</b>
+   <br />
+   <b>CS<small>CI</small> 2041: Advanced Programming Principles</b>
+   <br />
+   <b>March 22, 2021</b>
+  </p>
+  <p>
+   <b>0. Introduction.</b>
+  </p>
+  <p align="justify">
+   Most modern programming languages are <i>free format,</i> which means
+   that blanks and newlines appearing in their programs are ignored. A
+   <i>blank</i> is the character <tt>'&nbsp;'</tt>, also called
+   a <i>space.</i> A <i>newline</i> is the character that marks the
+   end of a line, and is written in OCaml as <tt>'\n'</tt>. Blanks,
+   newlines, and other ignored characters are often called
+   <i>whitespace.</i> A language that ignores whitespace allows a program
+   to be <i>indented</i> in a way that suggests its logical structure.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A <i>lexical scanner</i> is the part of
+   a programming language that reads tokens tokens from a program file,
+   ignoring whitespace. Each <i>token</i> is some meaningful part of a
+   program, such as a constant, a name, a number, an operator, or a punctuation
+   character. A lexical scanner for a subset of the programming
+   <i>Lisp</i> has been discussed in recent lectures.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A <i>comment</i> is part of a program
+   that provides explanatory text for a Human reader. Almost all modern
+   programming languages simply ignore comments. For this laboratory
+   assignment, you will modify the OCaml code for the Lisp lexical scanner so
+   that it also ignores comments, in the same way that it ignores whitespace.
+   The assignment is intended to give you some practice reading and modifying
+   code that you did not write yourself.
+  </p>
+  <p>
+   <b>1. Theory.</b>
+  </p>
+  <p align="justify">
+   In the subset of Lisp that will be discussed in the lectures, a comment
+   begins with a semicolon <tt>';'</tt>. It ends with a newline, or
+   the end of the file. For example, this Lisp program contains several
+   comments.
+  </p>
+  <blockquote>
+   <p>
+    <tt>;&nbsp;&nbsp;This&nbsp;Lisp&nbsp;function&nbsp;computes&nbsp;factorials.&nbsp;</tt>
+    <br />
+    <tt>&nbsp;</tt>
+    <br />
+    <tt>(define&nbsp;factorial&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;&nbsp;&nbsp;Its&nbsp;name&nbsp;is&nbsp;FACTORIAL.&nbsp;</tt>
+    <br />
+    <tt>&nbsp;(lambda&nbsp;(n)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;&nbsp;&nbsp;It&nbsp;has&nbsp;one&nbsp;parameter,&nbsp;N.&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;(if&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;(=&nbsp;n&nbsp;0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;&nbsp;&nbsp;If&nbsp;N&nbsp;is&nbsp;0&nbsp;...&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;&nbsp;&nbsp;then&nbsp;return&nbsp;1,&nbsp;else&nbsp;...&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;(*&nbsp;n&nbsp;(factorial&nbsp;(-&nbsp;n&nbsp;1))))))&nbsp;&nbsp;;&nbsp;&nbsp;return&nbsp;N&nbsp;times&nbsp;the&nbsp;FACTORIAL&nbsp;of&nbsp;N&nbsp;minus&nbsp;1.&nbsp;</tt>
+    <br />
+    <tt>&nbsp;</tt>
+    <br />
+    <tt>;&nbsp;&nbsp;That&rsquo;s&nbsp;all,&nbsp;folks!</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   There are more comments here than any normal programmer would use, but
+   having many comments makes a better example. The lexical scanner for Lisp
+   discussed in the lectures is able to read the tokens described in the
+   following table.
+  </p>
+  <table align="center" border="1" cellpadding="3" cellspacing="0">
+   <tr bgcolor="#D3D3D3" valign="top">
+    <td>
+     <p align="center">
+      <b><small>TOKEN</small></b>
+     </p>
+    </td>
+    <td>
+     <p align="center">
+      <b><small>MEANING</small></b>
+     </p>
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <p>
+      &nbsp;C<small>LOSE</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+     </p>
+    </td>
+    <td>
+     <p>
+      &nbsp;A closing parenthesis <tt>')'</tt>.&nbsp;
+     </p>
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <p>
+      &nbsp;E<small>ND</small>T<small>OKEN</small>&nbsp;
+     </p>
+    </td>
+    <td>
+     <p>
+      &nbsp;The end of the file.&nbsp;
+     </p>
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <p>
+      &nbsp;N<small>UMBER</small>T<small>OKEN</small>
+      <i>k</i>&nbsp;
+     </p>
+    </td>
+    <td>
+     <p>
+      &nbsp;An integer constant <i>k</i>.&nbsp;
+     </p>
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <p>
+      &nbsp;O<small>PEN</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+     </p>
+    </td>
+    <td>
+     <p>
+      &nbsp;An opening parenthesis <tt>'('</tt>.&nbsp;
+     </p>
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <p>
+      &nbsp;S<small>YMBOL</small>T<small>OKEN</small>
+      <i>n</i>&nbsp;
+     </p>
+    </td>
+    <td>
+     <p>
+      &nbsp;A name <i>n</i>.
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p align="justify">
+   If the lexical scanner was run on a file containing the Lisp program shown
+   above, then it would read the following series of tokens, in this order.
+  </p>
+  <blockquote>
+   <p>
+    O<small>PEN</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    S<small>YMBOL</small>T<small>OKEN</small>&nbsp;<tt>define</tt>&nbsp;
+    <br />
+    S<small>YMBOL</small>T<small>OKEN</small>&nbsp;<tt>factorial</tt>&nbsp;
+    <br />
+    O<small>PEN</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    S<small>YMBOL</small>T<small>OKEN</small>&nbsp;<tt>lambda</tt>&nbsp;
+    <br />
+    O<small>PEN</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    S<small>YMBOL</small>T<small>OKEN</small>&nbsp;<tt>n</tt>&nbsp;
+    <br />
+    C<small>LOSE</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    O<small>PEN</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    S<small>YMBOL</small>T<small>OKEN</small>&nbsp;<tt>if</tt>&nbsp;
+    <br />
+    O<small>PEN</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    S<small>YMBOL</small>T<small>OKEN</small>&nbsp;<tt>=</tt>&nbsp;
+    <br />
+    S<small>YMBOL</small>T<small>OKEN</small>&nbsp;<tt>n</tt>&nbsp;
+    <br />
+    N<small>UMBER</small>T<small>OKEN</small>&nbsp;<tt>0</tt>&nbsp;
+    <br />
+    C<small>LOSE</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    N<small>UMBER</small>T<small>OKEN</small>&nbsp;<tt>1</tt>&nbsp;
+    <br />
+    O<small>PEN</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    S<small>YMBOL</small>T<small>OKEN</small>&nbsp;<tt>*</tt>&nbsp;
+    <br />
+    S<small>YMBOL</small>T<small>OKEN</small>&nbsp;<tt>n</tt>&nbsp;
+    <br />
+    O<small>PEN</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    S<small>YMBOL</small>T<small>OKEN</small>&nbsp;<tt>factorial</tt>&nbsp;
+    <br />
+    O<small>PEN</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    S<small>YMBOL</small>T<small>OKEN</small>&nbsp;<tt>-</tt>&nbsp;
+    <br />
+    S<small>YMBOL</small>T<small>OKEN</small>&nbsp;<tt>n</tt>&nbsp;
+    <br />
+    N<small>UMBER</small>T<small>OKEN</small>&nbsp;<tt>1</tt>&nbsp;
+    <br />
+    C<small>LOSE</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    C<small>LOSE</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    C<small>LOSE</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    C<small>LOSE</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    C<small>LOSE</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    C<small>LOSE</small>P<small>AREN</small>T<small>OKEN</small>&nbsp;
+    <br />
+    E<small>ND</small>T<small>OKEN</small>
+   </p>
+  </blockquote>
+  <p align="justify">
+   Note that comments and whitespace are ignored by the lexical scanner.
+  </p>
+  <p>
+   <b>2. Implementation.</b>
+  </p>
+  <p align="justify">
+   The file
+   <a href="scanner9.ml">
+    <tt>scanner9.ml</tt>
+   </a>
+   on Canvas contains source code for an OCaml module called
+   <tt>Scanner</tt>. The module implements a lexical scanner for a subset
+   of Lisp, as described in recent lectures. It has a type
+   <tt>Scanner.token</tt> whose constructors make the tokens described in
+   the previous section. It also has a higher-order function
+   <tt>(Scanner.makeScanner</tt>&nbsp;<i>path</i><tt>)</tt>.
+   This returns a function that acts as a lexical scanner for a file whose
+   pathname is the string <i>path.</i> However, this function does not now
+   ignore comments.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; You must modify the code for
+   <tt>Scanner.makeScanner</tt> so that it returns a lexical scanner that
+   does ignore comments. This may involve writing one or more additional
+   helpers for <tt>Scanner.makeScanner</tt>. It may also involve making
+   changes to other helpers, etc. Hint: the scanner uses the zero-character
+   <tt>'\000'</tt> to indicate the end of a file.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The file
+   <a href="scanner9.ml">
+    <tt>scanner9.ml</tt>
+   </a>
+   also defines a function
+   <tt>(test</tt>&nbsp;<i>path</i><tt>)</tt> that creates a
+   lexical scanner, runs it on a file whose pathname is <i>path,</i> and
+   prints the tokens that the lexical scanner reads. It calls
+   <tt>test</tt> on
+   <a href="test9.txt">
+    <tt>"test9.txt"</tt>
+   </a>
+   , the pathname of a file that contains the Lisp program from the previous
+   section. If your modified scanner works correctly, then <tt>test</tt>
+   will print the same series of tokens shown in that section.
+  </p>
+  <p>
+   <b>3. Deliverables.</b>
+  </p>
+  <p align="justify">
+   Modify
+   <a href="scanner9.ml">
+    <tt>scanner9.ml</tt>
+   </a>
+   as described above. When you think your code is correct, submit the modified
+   file to Gradescope. If you do not know how to submit your work, then please
+   ask your lab TA&rsquo;s. It must be submitted by <b>11:55
+   <small>PM</small></b> on <b>Tuesday, March 30, 2021</b>.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This laboratory assignment is worth <b>32
+   points</b>, one point for each token correctly printed by the function
+   <tt>test</tt>. To compute your grade, the TA&rsquo;s will run the file
+   that you submit and compare its output with the expected correct output. If
+   your file does not run, then you will receive <b>0 points</b> for this
+   assignment, because it produces no output.
+   D<small>OUBLE</small>-<small>CHECK</small>, <small>BEFORE AND
+   AFTER YOU SUBMIT YOUR FILE</small>, <small>THAT IT RUNS
+   CORRECTLY</small>!
+  </p>
+ </body>
+</html>
