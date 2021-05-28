@@ -1,0 +1,379 @@
+<!-- Created by Bracy 0.4 on Monday, March 29, 2021 at 8:51 PM CDT -->
+<html>
+ <head>
+  <title>
+   CSci 2041 Computer Laboratory 10
+  </title>
+  <style>
+   a:active
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   a:link
+    { color: blue;
+      font-weight: bold;
+      text-decoration: none }
+   a:visited
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   hr
+    { background-color: black;
+      border: none;
+      color: black;
+      height: 1px }
+   table
+    { border-collapse: collapse }
+  </style>
+ </head>
+ <body bgcolor="#FFFFFF">
+  <p align="center">
+   <b>Computer Laboratory 10</b>
+   <br />
+   <b>CS<small>CI</small> 2041: Advanced Programming Principles</b>
+   <br />
+   <b>March 30, 2021</b>
+  </p>
+  <p>
+   <b>0. Introduction.</b>
+  </p>
+  <p align="justify">
+   In this laboratory assignment, you&rsquo;ll write a print function for the
+   Lisp interpreter that we&rsquo;re building in the lectures. It will print
+   Lisp <tt>thing</tt>&rsquo;s in readable form.
+  </p>
+  <p>
+   <b>1. Theory.</b>
+  </p>
+  <p align="justify">
+   OCaml provides a library module called <tt>Printf</tt> (with an upper
+   case <tt>P</tt>) that defines functions for printing. One way to use it
+   is to ask for a specific function you want. For example, to get the function
+   <tt>printf</tt> (with a lower case <tt>p</tt>) you&rsquo;d say
+   <tt>Printf.printf</tt>. Another way is to ask for everything
+   that&rsquo;s in the module. To do that, place the following line at the
+   beginning of your program file.
+  </p>
+  <blockquote>
+   <p>
+    <tt>open Printf ;;</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   After that, everything visible in the module <tt>Printf</tt> is
+   available for use in your program.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The function <tt>printf</tt> from the
+   module <tt>Printf</tt> takes a <i>format string</i> as its first
+   argument. The format string tells how to print its remaining arguments. Here
+   are some calls to <tt>printf</tt> that may be useful in this
+   assignment, along with brief descriptions of what they do.
+  </p>
+  <blockquote>
+   <dl compact="compact">
+    <dt>
+     <p>
+      <tt>printf "\n"</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Stop printing on the current line and begin a new line.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>printf "%i"</tt> <i>e</i>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Print the integer returned by the expression <i>e.</i>
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>printf "%s"</tt> <i>e</i>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Print the string returned by the expression <i>e,</i> but without
+      surrounding quotation marks.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>printf "&nbsp;"</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Print a blank (a space).
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>printf "</tt><i>C</i><sub>0</sub>C<sub>1</sub>
+      &#8943;
+      <i>C<sub>n</sub></i><sub>&#8722;1</sub><tt>"</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Print a string containing the characters
+      <i>C</i><sub>0</sub><i>C</i><sub>1</sub>&nbsp;&#8943;&nbsp;<i>C<sub>n</sub></i><sub>&#8722;1</sub>,
+      but without surrounding quotation marks.
+     </p>
+    </dd>
+   </dl>
+  </blockquote>
+  <p align="justify">
+   Some Lisp <tt>thing</tt>&rsquo;s can be printed with only a single call
+   to <tt>printf</tt>. Other <tt>thing</tt>&rsquo;s, like Lisp lists,
+   require something more complex. Recall that a list is written inside a pair
+   of parentheses <tt>()</tt> with its elements separated by blanks. The
+   following imperative pseudocode algorithm prints a Lisp list <i>L</i>
+   in this way.
+  </p>
+  <blockquote>
+   <p>
+    <i>print</i>&nbsp;<i>"</i>(<i>"</i>&nbsp;
+    <br />
+    <b>if</b>&nbsp;<i>L</i>&nbsp;<i>isn</i>'<i>t</i>&nbsp;<i>empty</i>&nbsp;
+    <br />
+    <font color="#FFFFFF"><b>if</b>&nbsp;</font><i>print</i>&nbsp;<i>L</i>'<i>s</i>&nbsp;<i>first</i>&nbsp;<i>element</i>&nbsp;
+    <br />
+    <font color="#FFFFFF"><b>if</b>&nbsp;</font><i>L</i>&nbsp;=&nbsp;<i>L</i>'<i>s</i>&nbsp;<i>remaining</i>&nbsp;<i>elements</i>&nbsp;
+    <br />
+    <font color="#FFFFFF"><b>if</b>&nbsp;</font><b>while</b>&nbsp;<i>L</i>&nbsp;<i>isn</i>'<i>t</i>&nbsp;<i>empty</i>&nbsp;
+    <br />
+    <font color="#FFFFFF"><b>if</b>&nbsp;<b>wh</b></font><i>print</i>&nbsp;<i>"</i>&nbsp;<i>"</i>&nbsp;
+    <br />
+    <font color="#FFFFFF"><b>if</b>&nbsp;<b>wh</b></font><i>print</i>&nbsp;<i>L</i>'<i>s</i>&nbsp;<i>first</i>&nbsp;<i>element</i>&nbsp;
+    <br />
+    <font color="#FFFFFF"><b>if</b>&nbsp;<b>wh</b></font><i>L</i>&nbsp;=&nbsp;<i>L</i>'<i>s</i>&nbsp;<i>remaining</i>&nbsp;<i>elements</i>&nbsp;
+    <br />
+    <i>print</i>&nbsp;<i>"</i>)<i>"</i>
+   </p>
+  </blockquote>
+  <p align="justify">
+   For example, the algorithm prints an empty list as a pair of parentheses
+   <tt>()</tt>, and a list of one element <i>a</i> as
+   <tt>(</tt><i>a</i><tt>)</tt>. It prints a list of two
+   elements <i>a</i> and <i>b</i> as
+   <tt>(</tt><i>a</i>&nbsp;<i>b</i><tt>)</tt>. It prints a
+   list of three elements <i>a</i>, <i>b</i>, and <i>c</i> as
+   <tt>(</tt><i>a</i>&nbsp;<i>b</i>&nbsp;<i>c</i><tt>)</tt>,
+   etc.
+  </p>
+  <p>
+   <b>2. Implementation.</b>
+  </p>
+  <p align="justify">
+   In the lectures, we defined an OCaml type <tt>thing</tt> to represent
+   Lisp objects. It looks like this.
+  </p>
+  <blockquote>
+   <p>
+    <tt>type&nbsp;thing&nbsp;=&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;type&nbsp;thing&nbsp;=&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;Closure&nbsp;of&nbsp;thing&nbsp;&#8727;&nbsp;thing&nbsp;&#8727;&nbsp;environment&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;Cons&nbsp;of&nbsp;thing&nbsp;&#8727;&nbsp;thing&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;Nil&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;int&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;Primitive&nbsp;of&nbsp;(thing&nbsp;-&gt;&nbsp;environment&nbsp;-&gt;&nbsp;thing)&nbsp;|&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;Symbol&nbsp;of&nbsp;string&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;and&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;environment&nbsp;=&nbsp;(string&nbsp;&#8727;&nbsp;thing)&nbsp;list&nbsp;;;</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   Here <tt>Closure</tt> represents a user defined function,
+   <tt>Cons</tt> represents a node in a nonempty list, <tt>Nil</tt>
+   represents an empty list, <tt>Number</tt> represents an integer,
+   <tt>Primitive</tt> represents a predefined function, and
+   <tt>Symbol</tt> represents a name. The following table shows how each
+   OCaml object described by this type must be printed. (The file
+   <a href="tests10.ml">
+    <tt>tests10.ml</tt>
+   </a>
+   has examples.)
+  </p>
+  <table align="center" border="1" cellpadding="3" cellspacing="0">
+   <tr bgcolor="#D3D3D3" valign="top">
+    <td>
+     <p align="center">
+      <b>OCaml object</b>
+     </p>
+    </td>
+    <td>
+     <p align="center">
+      <b>How to print it</b>
+     </p>
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <p>
+      &nbsp;<tt>Closure (</tt><i>p</i><tt>,</tt>
+      <i>b</i><tt>,</tt> <i>e</i><tt>)</tt>&nbsp;
+     </p>
+    </td>
+    <td>
+     <p>
+      &nbsp;<tt>[closure]</tt>&nbsp;
+     </p>
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <p>
+      &nbsp;<tt>Cons (</tt><i>e</i><sub>0</sub><tt>, Cons
+      (</tt><i>e</i><sub>1</sub> &#8943;<tt>, Cons
+      (</tt><i>e<sub>n</sub></i><sub>&#8722;1</sub><tt>,
+      Nil)</tt> &#8943; <tt>))</tt>&nbsp;
+     </p>
+    </td>
+    <td>
+     <p>
+      &nbsp;<tt>(</tt><i>e</i><sub>0</sub><tt>&nbsp;</tt><i>e</i><sub>1</sub><tt>&nbsp;</tt>&#8943;<tt>&nbsp;</tt><i>e<sub>n</sub></i><sub>&#8722;1</sub><tt>)</tt>&nbsp;
+     </p>
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <p>
+      &nbsp;<tt>Nil</tt>&nbsp;
+     </p>
+    </td>
+    <td>
+     <p>
+      &nbsp;<tt>nil</tt>&nbsp;
+     </p>
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <p>
+      &nbsp;<tt>Number</tt> <i>n</i>&nbsp;
+     </p>
+    </td>
+    <td>
+     <p>
+      &nbsp;<i>n</i>&nbsp;
+     </p>
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <p>
+      &nbsp;<tt>Primitive</tt> <i>h</i>&nbsp;
+     </p>
+    </td>
+    <td>
+     <p>
+      &nbsp;<tt>[Primitive]</tt>&nbsp;
+     </p>
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <p>
+      &nbsp;<tt>Symbol</tt> <i>s</i>&nbsp;
+     </p>
+    </td>
+    <td>
+     <p>
+      &nbsp;<i>s</i> but without quotation marks&nbsp;
+     </p>
+    </td>
+   </tr>
+  </table>
+  <p align="justify">
+   You must write OCaml code that defines the following functions. Each
+   function takes a <tt>thing</tt> as its argument. Your functions must
+   print these <tt>thing</tt>&rsquo;s as defined in the table.
+  </p>
+  <blockquote>
+   <dl compact="compact">
+    <dt>
+     <p>
+      <tt>printThing thing</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Print <tt>thing</tt>. Begin a new line after <tt>thing</tt> is
+      printed. Hint: call <tt>printingThing</tt> as a helper to do almost
+      all the work for this function.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>printingThing thing</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Print <tt>thing</tt>, without beginning a new line. Use a
+      <tt>match</tt>&#8211;<tt>with</tt> to decide what
+      <tt>thing</tt> is, and then print it according to the table. Hint:
+      call <tt>printingThings</tt> as a helper to do almost all the work
+      for printing lists made from <tt>Cons</tt>&rsquo;es and
+      <tt>Nil</tt>&rsquo;s.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>printingThings things</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Here <tt>things</tt> is a list made from <tt>Cons</tt>&rsquo;es
+      and <tt>Nil</tt>&rsquo;s. Print <tt>things</tt> without
+      beginning a new line, as described in the table. Hint: translate the
+      imperative pseudocode algorithm to applicative form.
+     </p>
+    </dd>
+   </dl>
+  </blockquote>
+  <p align="justify">
+   You may write additional helpers if you need them. However, you must not use
+   loops, mutable objects, or variables in any of your functions. If you do
+   that, then you will receive zero points for this assignment!
+  </p>
+  <p>
+   <b>3. Deliverables.</b>
+  </p>
+  <p align="justify">
+   The file
+   <a href="tests10.ml">
+    <tt>tests10.ml</tt>
+   </a>
+   contains some tests, worth a total of <b>34 points.</b> Insert your
+   code into this file and then run it with OCaml. When you think your code is
+   correct, submit to Gradescope the file
+   <a href="tests10.ml">
+    <tt>tests10.ml</tt>
+   </a>
+   with your code in it. If you don&rsquo;t know how or where to submit your
+   work, then please ask your lab TA&rsquo;s. Check to make sure you have
+   submitted the correct file, both before and after you submit it. It must be
+   submitted by <b>11:55 <small>PM</small></b> on <b>April 13,
+   2021</b>, after Spring Break. <b>Y<small>OU ARE NOT ALLOWED TO WORK
+   ON THIS ASSIGNMENT DURING</small> S<small>PRING</small>
+   B<small>REAK</small>! &#9786;</b>
+  </p>
+ </body>
+</html>
