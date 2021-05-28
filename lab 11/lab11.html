@@ -1,0 +1,468 @@
+<!-- Created by Bracy 0.4 on Tuesday, April 13, 2021 at 10:25 PM CDT -->
+<html>
+ <head>
+  <title>
+   CSci 2041 Computer Laboratory 11
+  </title>
+  <style>
+   a:active
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   a:link
+    { color: blue;
+      font-weight: bold;
+      text-decoration: none }
+   a:visited
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   hr
+    { background-color: black;
+      border: none;
+      color: black;
+      height: 1px }
+   table
+    { border-collapse: collapse }
+  </style>
+ </head>
+ <body bgcolor="#FFFFFF">
+  <p align="center">
+   <b>Computer Laboratory 11</b>
+   <br />
+   <b>CS<small>CI</small> 2041: Advanced Programming Principles</b>
+   <br />
+   <b>April 13, 2021</b>
+  </p>
+  <p>
+   <b>0. Introduction.</b>
+  </p>
+  <p align="justify">
+   In the past few lectures, we&rsquo;ve discussed how to implement a Lisp
+   interpreter in OCaml. For this laboratory assignment, you will modify the
+   Lisp interpreter so it can evaluate three kinds of expressions that it could
+   not evaluate before. Among other things, this gives you some practice
+   reading and modifying OCaml code that you didn&rsquo;t write
+   yourself&#8212;as you might have to do in the Real World.
+  </p>
+  <p>
+   <b>1. Implementation.</b>
+  </p>
+  <p align="justify">
+   The file
+   <a href="lisp.ml">
+    <tt>lisp.ml</tt>
+   </a>
+   contains OCaml source code for a Lisp interpreter something like the one
+   that has been discussed in the lectures. There was also an earlier version
+   of this interpreter posted to Canvas. Do not use this earlier version! It
+   has been removed.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Lisp has two <tt>thing</tt>&rsquo;s that
+   can be called: functions and special forms. A <i>function</i> takes a
+   fixed number of arguments and evaluates all of them. It returns a result
+   that is computed somehow from its arguments&rsquo; values. Some functions
+   are built into Lisp. Other functions can be defined by users.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A <i>special form</i> may take a
+   variable number of arguments, and/or may not evaluate all of them. It
+   returns a result that is computed somehow from its arguments&rsquo; values.
+   All special forms are built into Lisp. They cannot be defined by users.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; You must modify the interpreter so it can
+   evaluate a new function <tt>number</tt>, and two new special forms
+   <tt>imply</tt> and <tt>let</tt>. They are described as follows,
+   where the arrow &lsquo;&#8658;&rsquo; means <i>returns.</i>
+  </p>
+  <p align="justify">
+   <b>Number.</b> The function <tt>number</tt> takes one argument,
+   evaluates it, and tests if its result is a number (an integer). It returns
+   <tt>t</tt> if the test succeeds, and <tt>nil</tt> if the test
+   fails. Here are some examples of how <tt>number</tt> must work.
+  </p>
+  <blockquote>
+   <table cellpadding="0" cellspacing="0">
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(number nil)</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>nil</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(number (quote a))</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>nil</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(number (quote (a b c)))</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>nil</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(number 7734)</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>t</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(number 0)</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>t</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(number (+ 2 2))</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>t</tt>
+      </p>
+     </td>
+    </tr>
+   </table>
+  </blockquote>
+  <p align="justify">
+   If <tt>number</tt> is called with no arguments, or with two or more
+   arguments, then it must raise the exception <tt>EvaluatorError</tt>.
+   Modify the Lisp interpreter so it can evaluate calls to
+   <tt>number</tt>.
+  </p>
+  <p align="justify">
+   <b>Imply.</b> In propositional logic, &#945;&nbsp;&#8594;&nbsp;&#946;
+   is called an <i>implication,</i> and is read as
+   &lsquo;&lsquo;<i>alpha</i> implies <i>beta.</i>&rsquo;&rsquo; It
+   is an abbreviation for (&#172; &#945;)&nbsp;&#8744;&nbsp;&#946;. If &#945;
+   is <i>false,</i> then &#945;&nbsp;&#8594;&nbsp;&#946; is
+   <i>true.</i> If &#946; is <i>true,</i> then
+   &#945;&nbsp;&#8594;&nbsp;&#946; is <i>true.</i> Otherwise
+   &#945;&nbsp;&#8594;&nbsp;&#946; is <i>false.</i>
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The Lisp special form
+   <tt>(imply&nbsp;</tt><i>e</i>&#8321;<tt>&nbsp;</tt><i>e</i>&#8322;<tt>&nbsp;</tt>&#8943;<tt>&nbsp;</tt><i>e&#8345;</i><tt>)</tt>
+   acts like a series of one or more implications
+   <i>e</i>&#8321;&nbsp;&#8594;&nbsp;<i>e</i>&#8322;&nbsp;&#8943;&nbsp;&#8594;&nbsp;<i>e&#8345;.</i>
+   It evaluates its arguments <i>e</i>&#8321;, <i>e</i>&#8322;
+   &#8943;, <i>e&#8345;</i> one at a time, from left to right. If one of
+   its arguments evaluates to <tt>nil</tt>, then <tt>imply</tt> stops
+   immediately and returns <tt>t</tt>, without evaluating the remaining
+   arguments. If none of its arguments evaluate to <tt>nil</tt>, then
+   <tt>imply</tt> returns the result of evaluating its last argument. Here
+   are some examples of how <tt>imply</tt> must work.
+  </p>
+  <blockquote>
+   <table cellpadding="0" cellspacing="0">
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(imply t)</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>t</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(imply nil)</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>nil</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(imply nil (/ 0 0))</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>t</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(imply t nil (/ 0 0))</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>t</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(imply t t t 100)</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>100</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(imply (quote a) (quote b) (quote c) (quote z))</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>z</tt>
+      </p>
+     </td>
+    </tr>
+   </table>
+  </blockquote>
+  <p align="justify">
+   If <tt>imply</tt> is called with no arguments, then it must raise the
+   exception <tt>EvaluatorError</tt>. Modify the Lisp interpreter so it
+   can evaluate calls to <tt>imply</tt>.
+  </p>
+  <p align="justify">
+   <b>Let.</b> The Lisp special form
+   <tt>(let&nbsp;</tt><i>s</i><tt>&nbsp;</tt><i>e</i>&#8321;<tt>&nbsp;</tt><i>e</i>&#8322;<tt>)</tt>
+   acts like an OCaml <i>let</i>-expression. First, <tt>let</tt>
+   evaluates the expression <i>e</i>&#8321;. Next, it binds the symbol
+   <i>s</i> in the current environment to the result of evaluating
+   <i>e</i>&#8321;. (If <i>s</i> is not a symbol, then
+   <tt>let</tt> raises <tt>EvaluatorError</tt>.) Then it evaluates
+   the expression <i>e</i>&#8322;, which may contain at least one
+   appearance of <i>s</i>. Finally, <tt>let</tt> restores the current
+   environment to what it was before <i>s</i> was bound. Here are some
+   examples of how <tt>let</tt> must work.
+  </p>
+  <blockquote>
+   <table cellpadding="0" cellspacing="0">
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(let n 1 n)</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>1</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(let n 2 n)</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>2</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(let two 2 (+ two two))</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>4</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(let two 2 (number two))</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>t</tt>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p align="right">
+       <tt>(let a 1 (let b 2 (+ a b)))</tt>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;&#8658;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>3</tt>
+      </p>
+     </td>
+    </tr>
+   </table>
+  </blockquote>
+  <p align="justify">
+   If <tt>let</tt> is called with fewer than three arguments, or more than
+   three arguments, then it must raise the exception
+   <tt>EvaluatorError</tt>. If its first argument is not a symbol, then it
+   must also raise the exception <tt>EvaluatorError</tt>. Modify the Lisp
+   interpreter so it can evaluate calls to <tt>let</tt>.
+  </p>
+  <p>
+   <b>2. Deliverables.</b>
+  </p>
+  <p align="justify">
+   The file
+   <a href="tests11.ml">
+    <tt>tests11.ml</tt>
+   </a>
+   contains a version of the Lisp interpreter, along with code that performs a
+   series of tests. Each test is worth a specific number of points, in the
+   usual way. All the tests together are worth <b>40</b> points.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Modify the Lisp interpreter in
+   <a href="tests11.ml">
+    <tt>tests11.ml</tt>
+   </a>
+   so that it implements <tt>number</tt>, <tt>imply</tt>, and
+   <tt>let</tt>, as described above. Run the tests. When you are satisfied
+   with the results of the tests, submit the modified version of
+   <a href="tests11.ml">
+    <tt>tests11.ml</tt>
+   </a>
+   to Canvas. You must submit your work by <b>11:55
+   <small>PM</small></b> on <b>April 20, 2012</b>.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Check to make sure you have submitted the
+   correct file to Canvas, both before and after you have submitted it! Put
+   your name, and the name of your lab partner (if you worked with one) in a
+   comment at the beginning of the file!
+  </p>
+ </body>
+</html>
