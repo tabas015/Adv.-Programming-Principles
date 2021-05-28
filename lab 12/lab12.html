@@ -1,0 +1,317 @@
+<!-- Created by Bracy 0.4 on Tuesday, April 20, 2021 at 12:18 AM CDT -->
+<html>
+ <head>
+  <title>
+   CSci 2041 Computer Laboratory 12
+  </title>
+  <style>
+   a:active
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   a:link
+    { color: blue;
+      font-weight: bold;
+      text-decoration: none }
+   a:visited
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   hr
+    { background-color: black;
+      border: none;
+      color: black;
+      height: 1px }
+   table
+    { border-collapse: collapse }
+  </style>
+ </head>
+ <body bgcolor="#FFFFFF">
+  <p align="center">
+   <b>Computer Laboratory 12 / Project 4</b>
+   <br />
+   <b>CS<small>CI</small> 2041: Advanced Programming Principles</b>
+   <br />
+   <b>April 20, 2021</b>
+   <br />
+   <br />
+   T<small>HIS IS THE LAST LAB AND THE LAST PROJECT FOR THE
+   COURSE</small>!
+  </p>
+  <p>
+   <b>0. Introduction</b>
+  </p>
+  <p align="justify">
+   Although OCaml is primarily a functional programming language, it is also
+   possible to write conventional imperative, object-oriented programs using
+   it. In this lab, you will use OCaml&rsquo;s object oriented programming
+   mechanism to implement a mutable binary search tree.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This is both the last lab for the course, and
+   the last project. It is like any other lab, in that you can write it with a
+   partner, and your score will be based on whether or not your code passes a
+   series of tests. However, it is unlike a lab, because your score will be
+   treated as a project score, not a lab score. Recall that project scores
+   affect your final course grade more than lab scores.
+  </p>
+  <p>
+   <b>1. Theory.</b>
+  </p>
+  <p align="justify">
+   As you know, a <i>binary search tree</i> (BST) is a data structure that
+   associates totally ordered <i>keys</i> with their <i>values.</i>
+   (You&rsquo;re assumed to be familiar with BST&rsquo;s already, so no
+   explanation of how they work is necessary.) Although we&rsquo;ve previously
+   considered only immutable BST&rsquo;s in this course, BST&rsquo;s can also
+   be mutable, containing variables whose values can be changed. The operations
+   on a BST can be implemented by imperative procedures that use variables
+   internally.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The procedure G<small>ET</small> is
+   shown below in imperative pseudocode. It searches a BST whose root is
+   <i>root</i> for a node with the key <i>key.</i> If it finds such a
+   node, then it returns the node&rsquo;s <i>value.</i> If it cannot find
+   such a node, then it indicates an error.
+  </p>
+  <blockquote>
+   <p>
+    G<small>ET</small>&nbsp;(<i>key</i>)&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<i>subtree</i>&nbsp;=&nbsp;<i>root</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<b>while</b>&nbsp;<i>subtree</i>&nbsp;&#8800;&nbsp;<small>EMPTY</small>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b>&nbsp;<i>key</i>&nbsp;&lt;&nbsp;<i>subtree.key</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>subtree</i>&nbsp;=&nbsp;<i>subtree.left</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>else</b>&nbsp;<b>if</b>&nbsp;<i>key</i>&nbsp;&gt;&nbsp;<i>subtree.key</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>subtree</i>&nbsp;=&nbsp;<i>subtree.right</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>else</b>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b>&nbsp;<i>subtree.value</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<b>error</b>&nbsp;"No&nbsp;such&nbsp;key"
+   </p>
+  </blockquote>
+  <p align="justify">
+   The procedure P<small>UT</small> is also shown below in imperative
+   pseudocode. It modifies a mutable BST whose root is <i>root,</i> so
+   that the key <i>key</i> is now associated with its value
+   <i>value.</i> This can be done either by adding a new node, or by
+   changing the <i>value</i> of an existing node.
+  </p>
+  <blockquote>
+   <p>
+    P<small>UT</small>&nbsp;(<i>key</i>,&nbsp;<i>value</i>)&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<b>if</b>&nbsp;<i>root</i>&nbsp;==&nbsp;<small>EMPTY</small>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>root</i>&nbsp;=&nbsp;M<small>AKE</small>-<small>NODE</small>(<i>key</i>,&nbsp;<i>value</i>)&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<b>else</b>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>subtree</i>&nbsp;=&nbsp;<i>root</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>while</b>&nbsp;<small>TRUE</small>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b>&nbsp;<i>key</i>&nbsp;&lt;&nbsp;<i>subtree.key</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b>&nbsp;<i>subtree.left</i>&nbsp;==&nbsp;<small>EMPTY</small>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>subtree.left</i>&nbsp;=&nbsp;M<small>AKE</small>-<small>NODE</small>(<i>key</i>,&nbsp;<i>value</i>)&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>else</b>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>subtree</i>&nbsp;=&nbsp;<i>subtree.left</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>else</b>&nbsp;<b>if</b>&nbsp;<i>key</i>&nbsp;&gt;&nbsp;<i>subtree.key</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b>&nbsp;<i>subtree.right</i>&nbsp;==&nbsp;<small>EMPTY</small>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>subtree.right</i>&nbsp;=&nbsp;M<small>AKE</small>-<small>NODE</small>(<i>key</i>,&nbsp;<i>value</i>)&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>else</b>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>subtree</i>&nbsp;=&nbsp;<i>subtree.right</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>else</b>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>subtree.value</i>&nbsp;=&nbsp;<i>value</i>&nbsp;
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b>
+   </p>
+  </blockquote>
+  <p align="justify">
+   The procedure M<small>AKE</small>-N<small>ODE</small> returns a
+   new node with a given key and value. The new node&rsquo;s left and right
+   subtrees are <small>EMPTY</small>.
+  </p>
+  <p>
+   <b>2. Implementation.</b>
+  </p>
+  <p align="justify">
+   For this laboratory assignment, you must implement a mutable BST in OCaml
+   using imperative, object oriented programming techniques. The type
+   <tt>mutyBst</tt> (short for <i>mutable binary search tree</i>)
+   describes what the mutable BST is like.
+  </p>
+  <blockquote>
+   <p>
+    <tt>type&nbsp;('key,&nbsp;'value)&nbsp;mutyBst&nbsp;=&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;Empty&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;An&nbsp;empty&nbsp;BST.&nbsp;*)&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;Node&nbsp;of&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;'key&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;The&nbsp;key,&nbsp;duh.&nbsp;*)&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;'value&nbsp;ref&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;The&nbsp;key's&nbsp;value.&nbsp;*)&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;('key,&nbsp;'value)&nbsp;mutyBst&nbsp;ref&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Left&nbsp;subtree&nbsp;with&nbsp;keys&nbsp;&lt;&nbsp;key.&nbsp;*)&nbsp;</tt>
+    <br />
+    <tt>&nbsp;&nbsp;&nbsp;&nbsp;('key,&nbsp;'value)&nbsp;mutyBst&nbsp;ref&nbsp;;;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Right&nbsp;subtree&nbsp;with&nbsp;keys&nbsp;&gt;&nbsp;key.&nbsp;*)</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   Each <tt>mutyBst</tt> is either <tt>Empty</tt>, with no
+   <tt>Node</tt>&rsquo;s, or else has a <tt>Node</tt> at its root.
+   Each <tt>Node</tt> has four slots: a key, a variable that holds the
+   key&rsquo;s value, and two variables that hold its left and right subtrees,
+   which are themselves <tt>mutyBst</tt>&rsquo;s. note that the variable
+   parts of a <tt>Node</tt> can be changed.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Along with <tt>mutyBst</tt>, we&rsquo;ll
+   also need an exception <tt>MutyBstError</tt>. It&rsquo;s raised if we
+   look for a <tt>Node</tt> with a given key, but find that no such
+   <tt>Node</tt> exists.
+  </p>
+  <blockquote>
+   <p>
+    <tt>exception MutyBstError of string ;;</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   You must use <tt>mutyBst</tt> to implement the following OCaml
+   functions and methods in an object-oriented style. You can use internal
+   helper functions to do the work for the methods.
+  </p>
+  <blockquote>
+   <dl compact="compact">
+    <dt>
+     <p>
+      <tt>makeMutyBstNode key value</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Function. Return a new <tt>Node</tt> for the BST. The
+      <tt>Node</tt>&rsquo;s key slot must be <tt>key</tt> and its
+      value slot must be <tt>value</tt>. Its left and right slots must be
+      empty BST&rsquo;s.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>makeMutyBst ()</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Function. Return a new OCaml object. It must have a private variable
+      called <tt>root</tt> whose initial value is an empty BST. It must
+      also have public methods <tt>get</tt>, <tt>isEmpty</tt>, and
+      <tt>put</tt>, as described below. Note that
+      <tt>makeMutyBstNode</tt> is not a method.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>get key</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Method. Search the BST <tt>root</tt> for a <tt>Node</tt> with
+      the key <tt>key</tt>. If there is such a <tt>Node</tt>, then
+      return its <tt>value</tt>. If there is no such <tt>Node</tt>,
+      then raise an <tt>MutyBstError</tt>. Hint: use a tail-recursive
+      version of the algorithm described in the previous section.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>height ()</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Method. Return the number of <tt>Node</tt>&rsquo;s in the longest
+      path through the BST, starting at <tt>root</tt>.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>isEmpty ()</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Method. Return <tt>true</tt> if the BST is empty. Return
+      <tt>false</tt> otherwise.
+     </p>
+    </dd>
+    <dt>
+     <p>
+      <tt>put key value</tt>
+     </p>
+    </dt>
+    <dd>
+     <p align="justify">
+      Method. Modify the BST <tt>root</tt> so that it associates the key
+      <tt>key</tt> with the value <tt>value</tt>. Hint: use a
+      tail-recursive version of the algorithm described in the previous
+      section.
+     </p>
+    </dd>
+   </dl>
+  </blockquote>
+  <p align="justify">
+   Important: since <tt>mutyBst</tt>&rsquo;s contain variables, your
+   functions and methods must not copy <tt>Node</tt>&rsquo;s. (This is
+   different from how BST&rsquo;s worked in a previous lab assignment!)
+   Instead, they must work by changing the values of variables within existing
+   <tt>Node</tt>&rsquo;s, and by adding new <tt>Node</tt>&rsquo;s
+   where necessary.
+  </p>
+  <p>
+   <b>3. Deliverables.</b>
+  </p>
+  <p align="justify">
+   The file
+   <a href="tests12.ml">
+    <tt>tests12.ml</tt>
+   </a>
+   on Canvas contains OCaml code for the type <tt>mutyBst</tt> and the
+   exception <tt>mutyBstError</tt>. It also contains a series of tests,
+   worth <b>30 points.</b> Write code for the functions described above,
+   add it to <tt>tests12.ml</tt>, then run the resulting file to perform
+   the tests. Your score for this lab will be based on the number of tests that
+   succeed.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; You must submit the <tt>tests12.ml</tt>
+   file, with the code for your functions, by <b>11:55
+   <small>PM</small></b> on <b>April 27, 2021.</b> If you do not
+   know how or where to submit your file, then please ask your lab TA&rsquo;s.
+   <b>D<small>OUBLE CHECK</small></b> your work, <b><small>BEFORE
+   AND AFTER</small></b> you submit it, to make sure that you have
+   submitted the correct file!
+  </p>
+ </body>
+</html>
